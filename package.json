@@ -1,0 +1,24 @@
+{
+  "name": "ssps_gaming_api",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michalhejd/ssps_gaming-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michalhejd/ssps_gaming-server/issues"
+  },
+  "homepage": "https://github.com/michalhejd/ssps_gaming-server#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "nodemon": "^2.0.22"
+  }
+}
