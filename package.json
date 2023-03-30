@@ -3,9 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "main": "app.js",
+  "contributors": [
+    "Michal Hejduk",
+    "Lukas Papariga"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./server.js"
+    "dev": "nodemon ./bin/server.js"
   },
   "repository": {
     "type": "git",
