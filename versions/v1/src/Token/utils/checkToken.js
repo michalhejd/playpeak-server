@@ -3,24 +3,18 @@ import jwt from "jsonwebtoken";
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 
 const router = express.Router();
-
 router.use(async (req, res, next) => {
-  try {
     if (req.cookies.token) {
-      jwt.verify(req.cookies.token, process.env.SECRET, (err, decoded) => {
+      jwt.verify(req.cookies.token, process.env.JWT, (err, decoded) => {
         if (err) {
-          throw next(new Error(responseErrors.unauthorized));
+          throw next(new Error(responseErrors.cookies_unauthorized));
         }
-        console.log(decoded)
-        req.user = decoded;
+        req.user = decoded._id;
         next();
       });
     } else {
       next();
     }
-  } catch (err) {
-    console.log(err);
-  }
 });
 
 export default router;

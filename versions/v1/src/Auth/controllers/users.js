@@ -53,6 +53,12 @@ router.post("/register", async (req, res) => {
     handleSuccess(res, responseSuccess.user_created);
 });
 
+router.delete("/logout", async (req, res) => {
+    if(!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await User.findById(req.user);
+    if(!user) throw new Error(responseErrors.user_not_found);
+    handleSuccess(res, responseSuccess.logout_success);
+});
 //ověření kódu pomocí emailu
 
 export default router;
