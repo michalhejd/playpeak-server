@@ -1,6 +1,7 @@
 import express from 'express';
 //express async errors must be imported near after express import and must have single quotes
 import 'express-async-errors';
+import cookieParser from 'cookie-parser';
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from 'mongoose';
@@ -17,6 +18,7 @@ mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(morgan('dev'));
 
 

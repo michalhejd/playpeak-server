@@ -1,8 +1,15 @@
 export const responseErrors = {
-    bad_format: "bad format"
-}
+    bad_format: "bad_format",
+    unauthorized: "unauthorized",
+    already_logged_in: "already_logged_in",
+    user_not_found: "user_not_found",
+    email_already_exists: "email_already_exists",
+    nickname_already_exists: "nickname_already_exists",
+    server_error: "server_error",
+};
 
-export const responses = {
+export const responseSuccess = {
     user_created: "user_created",
-    login_success: "login_success"
-}
+    login_success: "login_success",
+    logout_success: "logout_success"
+};
