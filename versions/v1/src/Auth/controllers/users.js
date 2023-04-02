@@ -1,12 +1,13 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
 import { responseSuccess } from "../../Responses/utils/responseTemplate.js";
 import { handleSuccess } from "../../Responses/utils/successHandler.js";
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
+import { roles } from "../models/User.js";
 import User from "../models/User.js";
+import { verifyUserParams } from "../utils/verifyUser.js";
 
 const router = express.Router();
 
@@ -20,8 +21,9 @@ router.post("/login", async (req, res) => {
     // checking if user exists
     if(!newUser) throw new Error(responseErrors.user_not_found);
     // checking if password is correct
-    if(await bcrypt.compare(body.password, newUser.password)) throw new Error(responseErrors.bad_format);
-    // creating token and responsing
+    if(await bcrypt.compare(body.password, newUser.password)) throw new Error(responseErrors.bad_credentials);
+    //checking if user is verified
+    verifyUserParams(newUser._id)
     handleSuccess(res, responseSuccess.login_success, { token: signToken({ _id: newUser._id }) });
 });
 
@@ -54,11 +56,42 @@ router.post("/register", async (req, res) => {
 });
 
 router.delete("/logout", async (req, res) => {
+    //check if user is logged in
     if(!req.user) throw new Error(responseErrors.unauthorized);
     const user = await User.findById(req.user);
-    if(!user) throw new Error(responseErrors.user_not_found);
+    //check if user exists
+    if(!user) throw new Error(responseErrors.cookies_unauthorized);
+    //sending response
     handleSuccess(res, responseSuccess.logout_success);
 });
-//ověření kódu pomocí emailu
+
+
+/*router.post("/", async (req, res) => {
+    if(!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await verifyUserParams(req.user)
+    if(user.role < roles.admin) throw new Error(responseErrors.forbidden);
+
+    const body = req.body;
+    if(!verifyRegisterBody(body.email, body.nickname, body.name, body.password, body.birthdate)) throw new Error(responseErrors.bad_format);
+    if(body.role && typeof body.role !== "number") throw new Error(responseErrors.bad_format);
+    if(body.role >= user.role) throw new Error(responseErrors.forbidden);
+
+    try{
+    const newUser = new User({
+        email: body.email,
+        nickname: body.nickname,
+        name: body.name,
+        birthdate: body.birthdate,
+        password: null,
+        role: body.role || roles.player
+    });
+    await newUser.save();
+    } catch (e) {
+        console.log(e)
+        throw new Error(responseErrors.server_error);
+    }
+
+    handleSuccess(res, responseSuccess.user_created);
+})*/
 
 export default router;
