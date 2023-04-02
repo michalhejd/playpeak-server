@@ -21,7 +21,7 @@ router.post("/login", async (req, res) => {
     // checking if user exists
     if(!newUser) throw new Error(responseErrors.user_not_found);
     // checking if password is correct
-    if(await bcrypt.compare(body.password, newUser.password)) throw new Error(responseErrors.bad_credentials);
+    if(!await bcrypt.compare(body.password, newUser.password)) throw new Error(responseErrors.bad_credentials);
     //checking if user is verified
     verifyUserParams(newUser._id)
     handleSuccess(res, responseSuccess.login_success, { token: signToken({ _id: newUser._id }) });

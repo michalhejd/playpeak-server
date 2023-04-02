@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./bin/server.js"
+    "dev": "NODE_ENV=development nodemon ./bin/server.js",
+    "start": "NODE_ENV=production node ./bin/server.js"
   },
   "repository": {
     "type": "git",
