@@ -6,6 +6,9 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.success:
             res.status(200).json({meta: {message: "Success", status: 200}, data: data});
             return;
+        case responseSuccess.users_found:
+            res.status(200).json({meta: {message: "Users found", status: 200}, data: data});
+            return;
         case responseSuccess.login_success:
             res.cookie("token", data.token, {httpOnly: true}).status(200).json({meta: {message: "Login successful", status: 200}});
             return;

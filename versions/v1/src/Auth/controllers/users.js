@@ -8,6 +8,7 @@ import { signToken } from "../../Token/utils/signToken.js";
 import { roles } from "../models/User.js";
 import User from "../models/User.js";
 import { verifyUserParams } from "../utils/verifyUser.js";
+import { formatUsers } from "../utils/getFormatter.js";
 
 const router = express.Router();
 
@@ -93,5 +94,29 @@ router.delete("/logout", async (req, res) => {
 
     handleSuccess(res, responseSuccess.user_created);
 })*/
+
+router.get("/", async (req, res) => {
+    if(!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await verifyUserParams(req.user)
+    if(user.role < roles.admin) throw new Error(responseErrors.forbidden);
+    const query = req.query;
+    const maxUsersPerPage = 2;
+    const maxPages = Math.ceil(await User.countDocuments() / maxUsersPerPage);
+    const page = query.page ? ((parseInt(query.page) > 0) ? ((parseInt(query.page) <= maxPages) ? parseInt(query.page) : 1) : 1) : 1
+    if(page < 1) 
+    if(page > maxPages) throw new Error(responseErrors.bad_format);
+    if(typeof query.sort == "string"){
+        if(query.sort == "newest"){
+            query.sort = { _id: -1 };
+        }
+        else if(query.sort == "oldest"){
+            query.sort = { _id: 1 };
+        }
+    }
+    const users = await formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1}).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
+    const currentPage = page;
+
+    handleSuccess(res, responseSuccess.users_found, { users,  maxPages, currentPage });
+});
 
 export default router;
