@@ -23,7 +23,7 @@ Table tournaments {
   teams Array
   maxTeams Int32
   gameMode String
-  place String
+  matches Array
 }
 
 
@@ -49,6 +49,7 @@ Table teams {
   players Array
   owner ObjectId
   invitations Boolean
+  matches Array
 }
 
 Table matches {
