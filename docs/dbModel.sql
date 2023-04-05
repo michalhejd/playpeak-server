@@ -48,11 +48,17 @@ Table teams {
   shortName String
   players Array
   owner ObjectId
-  invatitions Boolean
+  invitations Boolean
 }
 
 Table matches {
   _id ObjectId [primary key]
+  matchDate Date
+  team1 ObjectId
+  team2 ObjectId
+  winner ObjectId
+  scoreTeam1 Int32
+  scoreTeam2 Int32
 }
 
 Table brackets {
@@ -70,6 +76,22 @@ Table teamInvitations {
   to ObjectId
 }
 
+Table teamRequests {
+  _id ObjectId [primary key]
+  team ObjectId
+  from ObjectId
+}
+
+Table example0 {
+  _id ObjectId [primary key]
+
+}
+
+Table example1 {
+  _id ObjectId [primary key]
+
+}
+
 Ref: teams.players > users._id
 Ref: tournaments.teams > teams._id
 Ref: tournaments.organizer - users._id
@@ -78,3 +100,8 @@ Ref: teams.owner - users._id
 Ref: teamInvitations.team - teams._id
 Ref: teamInvitations.from - users._id
 Ref: teamInvitations.to - users._id
+Ref: teamRequests.team - teams._id
+Ref: teamRequests.from - users._id
+Ref: matches.team1 - teams._id
+Ref: matches.team2 - teams._id
+Ref: matches.winner - teams._id
