@@ -19,6 +19,12 @@ const gameSchema = new Schema({
         required: true,
         minLength: 1,
         maxLength: 256
+    },
+    slug: {
+        type: String,
+        required: true,
+        minLength: 3,
+        maxLength: 32
     }
 });
 
