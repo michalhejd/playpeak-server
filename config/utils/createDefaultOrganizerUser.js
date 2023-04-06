@@ -20,7 +20,8 @@ export async function defaultOrganizer() {
             nickname: "admin",
             name: "admin",
             birthdate: new Date(),
-            role: roles.organizer,
+            // setting to highest role -> root, this role can only be reached by this User
+            role: roles.root,
             verified: true
         })
         await user.save()

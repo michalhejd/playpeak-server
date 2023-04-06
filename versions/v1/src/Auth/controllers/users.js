@@ -1,5 +1,4 @@
 import express from "express";
-import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import { roles } from "../models/User.js";
 import { responseSuccess } from "../../Responses/utils/responseTemplate.js";
@@ -11,6 +10,8 @@ import { verifyUserParams } from "../utils/verifyUser.js";
 import { formatUsers } from "../utils/getFormatter.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { Verify } from "../utils/verifyUserParams.js";
+import { generateVerificationCode } from "../services/generateToken.js";
+import Code from "../models/Code.js";
 
 const router = express.Router();
 
@@ -34,28 +35,54 @@ router.post("/register", async (req, res) => {
     const body = req.body;
     // verify if all params are in correct format => if they are string, number, date, their length etc.
     // function returns true if all params are in correct format, otherwise returns false
+    
     if (!verifyRegisterBody(body.email, body.nickname, body.name, body.password, body.birthdate)) throw new Error(responseErrors.bad_format);
 
     // verify if email and nickname are not already in use
     if (await User.findOne({ email: body.email })) throw new Error(responseErrors.email_already_exists);
     if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
 
+    // hash user password
+    const hashedPassword = await hashPassword(body.password);
+
+
+    // create user instance
     const user = new User({
         email: body.email,
         nickname: body.nickname,
         name: body.name,
-        password: body.password,
+        password: hashedPassword,
         birthdate: body.birthdate
     });
-    // todo:
-    // zahashovat heslo
-    // model pro token s kódem pro ověření emailu
+
+    // generate verification code
+    const code = generateVerificationCode();
+
+    const verificationCode = new Code({
+        code: code,
+        sentToUser: user._id
+    });
+
+    // save code to db
+    await verificationCode.save();
+    
+    
     // vytvoření tokenu s kódem pro ověření emailu a uložení kódu do db a uložení uživatele do db
-    // await token.save();
+    
+    // save user to db
     await user.save();
 
     // odeslání emailu s kódem pro ověření emailu společně
     handleSuccess(res, responseSuccess.user_created);
+});
+
+router.post("/resendVerification", async (req, res) => {
+    const body = req.body;
+
+    // verify if email is in correct format
+    if (!Verify.email(body.email)) throw new Error(responseErrors.bad_format);
+
+
 });
 
 router.delete("/logout", async (req, res) => {

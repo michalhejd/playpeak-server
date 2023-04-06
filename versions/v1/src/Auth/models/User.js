@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 export const roles = {
     player: 0,
     admin: 1,
-    organizer: 2
+    superAdmin: 2,
+    root: 3
 }
 
 const userSchema = new mongoose.Schema({
@@ -43,6 +44,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false
+    },
+    // user must confirm within 24 hours
+    expiresAt: {
+        type: Date,
+        default: Date.now,
+        expires: 60 * 60 * 24
     }
 });
 
