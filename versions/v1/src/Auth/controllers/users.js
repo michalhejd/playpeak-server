@@ -97,25 +97,31 @@ router.delete("/logout", async (req, res) => {
 
 router.get("/", async (req, res) => {
     if(!req.user) throw new Error(responseErrors.unauthorized);
+    //pass to function which will check if user exists and if user is verified
     const user = await verifyUserParams(req.user)
     if(user.role < roles.admin) throw new Error(responseErrors.forbidden);
+    //get of query params
     const query = req.query;
+    //maximum users per page
     const maxUsersPerPage = 2;
+    //calc of max pages (from total User documents in db)
     const maxPages = Math.ceil(await User.countDocuments() / maxUsersPerPage);
-    const page = query.page ? ((parseInt(query.page) > 0) ? ((parseInt(query.page) <= maxPages) ? parseInt(query.page) : 1) : 1) : 1
-    if(page < 1) 
-    if(page > maxPages) throw new Error(responseErrors.bad_format);
+    //check if page can be returned (if page number is not greater than maxPages and if page is not less than 1) otherwise return first page
+    const page = query.page ? ((parseInt(query.page) > 0) ? ((parseInt(query.page) <= maxPages) ? parseInt(query.page) : 1) : 1) : 1;
+    //check if sort is string
     if(typeof query.sort == "string"){
+        //check which value of sort is requested otherwise not to sort
         if(query.sort == "newest"){
             query.sort = { _id: -1 };
         }
-        else if(query.sort == "oldest"){
+        if(query.sort == "oldest"){
             query.sort = { _id: 1 };
         }
     }
+    //create users const and then call func which will format users(it will return users without their password and __v)
     const users = formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1}).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
+    //return param which will tell user on which page he is
     const currentPage = page;
-
     handleSuccess(res, responseSuccess.users_found, { users,  maxPages, currentPage });
 });
 
