@@ -113,7 +113,7 @@ router.get("/", async (req, res) => {
             query.sort = { _id: 1 };
         }
     }
-    const users = await formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1}).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
+    const users = formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1}).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
     const currentPage = page;
 
     handleSuccess(res, responseSuccess.users_found, { users,  maxPages, currentPage });

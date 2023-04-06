@@ -2,15 +2,23 @@ import mongoose from "mongoose"
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 export async function formatUser(user){
     if(!user) throw new Error(responseErrors.server_error)
-    delete user.password
-    return user
+    //ssps cajthaml discord
+    //deletes password and __v from user
+    const { password, __v, ...newUser } = user
+    return newUser
 }
 
 export function formatUsers(users){
     if(!users) throw new Error(responseErrors.server_error)
-    for(let i = 0; i < users.length; i++){
-        delete users[i].password
-        delete users[i].__v
-    }
-    return users
+    //creates new array for formatted users
+    let newUsers = []
+
+    users.map(user => {
+        //ssps cajthaml discord
+        //deletes password and __v from user
+        const { password, __v, ...newUser } = user
+        //pushes user to newUsers
+        newUsers.push(newUser)
+    })
+    return newUsers
 }
