@@ -19,4 +19,5 @@ export const responseSuccess = {
     login_success: "login_success",
     logout_success: "logout_success",
     users_found: "users_found",
+    user_updated: "user_updated"
 };

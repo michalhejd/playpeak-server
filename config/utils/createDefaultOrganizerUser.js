@@ -1,6 +1,6 @@
 import User from '../../versions/v1/src/Auth/models/User.js';
 import { roles } from '../../versions/v1/src/Auth/models/User.js';
-import hashPassword from '../../versions/v1/src/Auth/utils/hashPassword.js';
+import {hashPassword} from '../../versions/v1/src/Auth/utils/hashPassword.js';
 
 export async function defaultOrganizer() {
     if (!process.env.ADMIN_EMAIL) {

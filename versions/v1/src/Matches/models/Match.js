@@ -24,13 +24,11 @@ const matchSchema = new Schema({
     },
     scoreTeam1: {
         type: Number,
-        ref: 'Team',
         required: true,
         default: 0
     },
     scoreTeam2: {
         type: Number,
-        ref: 'Team',
         required: true,
         default: 0
     }

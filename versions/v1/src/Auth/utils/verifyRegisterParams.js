@@ -24,7 +24,7 @@ export function verifyRegisterBody(email, nickname, name, password, birthdate, r
 }
 
 
-function regexMail(email) {
+export function regexMail(email) {
     const emailRegexp = /^[\w\._-]+@(skola\.)?ssps\.cz$/
     return emailRegexp.test(email);
 }

@@ -4,6 +4,8 @@ import { checkEnvironments } from "../config/utils/checkEnvironments.js";
 import { defaultOrganizer } from "../config/utils/createDefaultOrganizerUser.js";
 config()
 
+process.on('warning', e => console.warn(e.stack));
+
 checkEnvironments()
 await defaultOrganizer()
 
