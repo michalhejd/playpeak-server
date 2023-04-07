@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const verificationCodeSchema = new Schema({
     code: {
-        type: Number,
+        type: String,
         length: 6,
         required: true
     },

@@ -70,9 +70,10 @@ router.post("/register", async (req, res) => {
     // save user to db
     await user.save();
 
+    // sending verification email with code and link to verification page
     sendEmail(user, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
 
-    // odeslání emailu s kódem pro ověření emailu společně
+    // sending response
     handleSuccess(res, responseSuccess.user_created);
 });
 
@@ -282,17 +283,19 @@ router.put("/:id", async (req, res) => {
 });
 
 router.patch("/verify", async (req, res) => {
+    console.log("gere");
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
-    //check if body contains email and if email is in correct format
+    // check if body contains email and if email is in correct format
+
     if (!body.email) throw new Error(responseErrors.bad_format);
     if (!body.code) throw new Error(responseErrors.bad_format);
     const user = await User.findOne({ email: body.email });
     if (!user) throw new Error(responseErrors.user_not_found);
-    //check if user is verified
+    // check if user is verified
     if (user.verified) throw new Error(responseErrors.already_verified);
 
-    const code = await Code.findOne({ user: user._id });
+    const code = await Code.findOne({ sentToUser: user._id });
     if (!code) throw new Error(responseErrors.code_not_found);
     if (code.code !== body.code) throw new Error(responseErrors.bad_code);
 

@@ -14,7 +14,6 @@ export const responseErrors = {
     already_verified: "already_verified",
     code_not_found: "code_not_found",
     bad_code: "bad_code",
-    user_verified: "user_verified"
 };
 
 export const responseSuccess = {
@@ -23,5 +22,6 @@ export const responseSuccess = {
     login_success: "login_success",
     logout_success: "logout_success",
     users_found: "users_found",
-    user_updated: "user_updated"
+    user_updated: "user_updated",
+    user_verified: "user_verified"
 };
