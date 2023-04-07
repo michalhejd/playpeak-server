@@ -334,4 +334,29 @@ router.patch("/verify", async (req, res) => {
     
     handleSuccess(res, responseSuccess.user_verified);
 });
+
+router.patch("/verify/:id", async (req, res) => {
+    if (req.user) throw new Error(responseErrors.already_logged_in);
+    const params = req.params;
+    if(typeof params.id !== "string") throw new Error(responseErrors.bad_format);
+    if(!Verify.id(params.id)) throw new Error(responseErrors.bad_format);
+    const code = await Code.findOne({ _id: params.id });
+    if (!code) throw new Error(responseErrors.code_not_found);
+
+    const user = await User.findOne({ _id: params.id });
+    if (!user) throw new Error(responseErrors.user_not_found);
+    // check if user is verified
+    if (user.verified) throw new Error(responseErrors.already_verified);
+
+    //delete code
+    await Code.deleteOne({ _id: params.id });
+
+    user.verified = true;
+    user.expiresAt = null;
+
+    await user.save();
+
+    handleSuccess(res, responseSuccess.user_verified);
+});
+
 export default router;
