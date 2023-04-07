@@ -13,6 +13,8 @@ export function handleErr(err, req, res, next) {
             return res.clearCookie("token").status(401).json({ meta: { message: "Session expired", date: Date.now(), status: 401, error: err.message } });
         case responseErrors.bad_credentials:
             return res.status(401).json({ meta: { message: "Bad credentials", date: Date.now(), status: 401, error: err.message } });
+        case responseErrors.bad_code:
+            return res.status(401).json({ meta: { message: "Bad code", date: Date.now(), status: 401, error: err.message } });
         case responseErrors.forbidden:
             return res.status(403).json({ meta: { message: "Forbidden", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.not_verified:
@@ -21,16 +23,21 @@ export function handleErr(err, req, res, next) {
             return res.status(403).json({ meta: { message: "You need to change your password", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.user_not_found:
             return res.status(404).json({ meta: { message: "User not found", date: Date.now(), status: 404, error: err.message } });
+        case responseErrors.code_not_found:
+            return res.status(404).json({ meta: { message: "Code not found, you have to resend your verification code", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.already_logged_in:
             return res.status(409).json({ meta: { message: "Already logged in", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.already_verified:
+            return res.status(409).json({ meta: { message: "Already verified", date: Date.now(), status: 409, error: err.message } });
         // saveErrorToDabase(err, timeOfError);
         case responseErrors.server_error:
-            return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500, error: err.message } });
+            return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         case responseErrors.email_already_exists:
             return res.status(409).json({ meta: { message: "Email already exists", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.nickname_already_exists:
             return res.status(409).json({ meta: { message: "Nickname already exists", date: Date.now(), status: 409, error: err.message } });
+        // saveErrorToDabase(err, timeOfError);
         default:
-            return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500, error: err.message } });
+            return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
     }
 };

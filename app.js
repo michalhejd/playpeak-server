@@ -1,11 +1,18 @@
 import express from 'express';
 //express async errors must be imported near after express import and must have single quotes
+import { config } from 'dotenv';
 import 'express-async-errors';
 import cookieParser from 'cookie-parser';
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from 'mongoose';
 import v1 from "./versions/v1/router.js";
+import { checkEnvironments } from './config/utils/checkEnvironments.js';
+import { defaultRoot } from './config/utils/createDefaultRootUser.js';
+
+config();
+
+checkEnvironments()
 
 mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
 }).then(() => {
@@ -14,6 +21,7 @@ mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
     console.log(err);
 });
 
+await defaultRoot()
 
 const app = express();
 app.use(cors());
@@ -22,6 +30,12 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 
+
 app.use("/api/v1", v1);
 
-export default app;
+app.listen(process.env.PORT || 3000, () => {
+    if (process.env.NODE_ENV == 'development')
+        console.log(`Server running on port ${process.env.PORT || 3000}`);
+    else
+        console.log(`Server is running`);
+});

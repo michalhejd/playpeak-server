@@ -10,7 +10,11 @@ export const responseErrors = {
     nickname_already_exists: "nickname_already_exists",
     server_error: "server_error",
     not_verified: "not_verified",
-    change_password: "change_password"
+    change_password: "change_password",
+    already_verified: "already_verified",
+    code_not_found: "code_not_found",
+    bad_code: "bad_code",
+    user_verified: "user_verified"
 };
 
 export const responseSuccess = {

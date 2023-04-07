@@ -42,6 +42,7 @@ export class Verify {
     static email(email) {
         if (typeof email !== 'string') return false;
         if (email.length < 6 || email.length > 64) return false;
+        if(process.env.NODE_ENV == 'development') return true;
         const emailRegexp = /^[\w\._-]+@(skola\.)?ssps\.cz$/
         return emailRegexp.test(email);
     }

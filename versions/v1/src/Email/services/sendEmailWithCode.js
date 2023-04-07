@@ -2,6 +2,7 @@ import {vokativ, isWoman} from "vokativ";
 import nodemailer from "nodemailer";
 import {config} from "dotenv"
 import { verificationTemplate } from "../models/Email.js";
+import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 config()
 
 export async function sendEmail(user, code, url) {
@@ -45,6 +46,7 @@ export async function sendEmail(user, code, url) {
     });
     } catch (err) {
         console.log(err)
+        throw new Error(responseErrors.server_error)
     }
     return
 }

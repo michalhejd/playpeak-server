@@ -36,7 +36,7 @@ router.post("/register", async (req, res) => {
     const body = req.body;
     // verify if all params are in correct format => if they are string, number, date, their length etc.
     // function returns true if all params are in correct format, otherwise returns false
-    
+
     if (!verifyRegisterBody(body.email, body.nickname, body.name, body.password, body.birthdate)) throw new Error(responseErrors.bad_format);
 
     // verify if email and nickname are not already in use
@@ -66,7 +66,7 @@ router.post("/register", async (req, res) => {
 
     // save code to db
     await verificationCode.save();
-    
+
     // save user to db
     await user.save();
 
@@ -96,33 +96,64 @@ router.delete("/logout", async (req, res) => {
 });
 
 
-/*router.post("/", async (req, res) => {
-    if(!req.user) throw new Error(responseErrors.unauthorized);
+router.post("/", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    // check if user exists and if his account is verified
     const user = await verifyUserParams(req.user)
-    if(user.role < roles.admin) throw new Error(responseErrors.forbidden);
+    // check if user is at least admin
+    if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
 
     const body = req.body;
-    if(!verifyRegisterBody(body.email, body.nickname, body.name, body.password, body.birthdate)) throw new Error(responseErrors.bad_format);
-    if(body.role && typeof body.role !== "number") throw new Error(responseErrors.bad_format);
-    if(body.role >= user.role) throw new Error(responseErrors.forbidden);
 
-    try{
+    // verify if all params are in correct format => if they are string, number, date, their length etc.
+    if (!verifyRegisterBody(body.email, body.nickname, body.name, body.password, body.birthdate)) throw new Error(responseErrors.bad_format);
+
+    // if body contains role param, check if user is superAdmin and verify if role is in correct format
+    if (body.role) {
+        if (!Verify.role(body.role)) throw new Error(responseErrors.bad_format);
+        if (body.role >= user.role) throw new Error(responseErrors.forbidden);
+    }
+    // if body contains verified param, check if user is superAdmin and verify if verified is in correct format
+    if (body.verified) {
+        if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
+        if (!Verify.verified(body.verified)) throw new Error(responseErrors.bad_format);
+    }
+
+    // verify if email and nickname are not already in use
+    if (await User.findOne({ email: body.email })) throw new Error(responseErrors.email_already_exists);
+    if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
+
+    // hash user password
+    const hashedPassword = await hashPassword(body.password);
+
     const newUser = new User({
         email: body.email,
         nickname: body.nickname,
         name: body.name,
         birthdate: body.birthdate,
-        password: null,
-        role: body.role || roles.player
+        password: hashedPassword,
+        role: body.role || roles.player,
+        verified: body.verified || false
     });
+
+    const code = generateVerificationCode();
+
+    const verificationCode = new Code({
+        code: code,
+        sentToUser: newUser._id
+    });
+
+    // save code to db
+    await verificationCode.save();
+
+    // save user to db
     await newUser.save();
-    } catch (e) {
-        console.log(e)
-        throw new Error(responseErrors.server_error);
-    }
+
+    // send email with code
+    sendEmail(newUser, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
 
     handleSuccess(res, responseSuccess.user_created);
-})*/
+})
 
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -199,6 +230,7 @@ router.put("/:id", async (req, res) => {
 
     //check if user exists
     if (!updatedUser) throw new Error(responseErrors.user_not_found);
+    if (updatedUser.role >= user.role) throw new Error(responseErrors.forbidden);
 
     const body = req.body;
 
@@ -212,7 +244,7 @@ router.put("/:id", async (req, res) => {
 
     //check if body contains verified and if verified is in correct format
     if (body.verified) {
-        if (user.role < roles.organizer) throw new Error(responseErrors.forbidden);
+        if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
         if (!Verify.verified(body.verified)) throw new Error(responseErrors.bad_format);
     }
 
@@ -247,4 +279,24 @@ router.put("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.user_updated);
 });
 
+router.patch("/verify", async (req, res) => {
+    if (req.user) throw new Error(responseErrors.already_logged_in);
+    const body = req.body;
+    //check if body contains email and if email is in correct format
+    if (!body.email) throw new Error(responseErrors.bad_format);
+    if(!body.code) throw new Error(responseErrors.bad_format);
+    const user = await User.findOne({ email: body.email });
+    if (!user) throw new Error(responseErrors.user_not_found);
+    //check if user is verified
+    if (user.verified) throw new Error(responseErrors.already_verified);
+
+    const code = await Code.findOne({ user: user._id});
+    if(!code) throw new Error(responseErrors.code_not_found);
+    if(code.code !== body.code) throw new Error(responseErrors.bad_code);
+
+    user.verified = true;
+    await user.save();
+    await code.delete();
+    handleSuccess(res, responseSuccess.user_verified);
+});
 export default router;

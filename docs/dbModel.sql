@@ -23,7 +23,6 @@ Table tournaments {
   teams Array
   maxTeams Int32
   gameMode String
-  matches Array
 }
 
 
@@ -49,7 +48,6 @@ Table teams {
   players Array
   owner ObjectId
   invitations Boolean
-  matches Array
 }
 
 Table matches {
@@ -83,14 +81,10 @@ Table teamRequests {
   from ObjectId
 }
 
-Table example0 {
+Table token {
   _id ObjectId [primary key]
-
-}
-
-Table example1 {
-  _id ObjectId [primary key]
-
+  code String
+  user ObjectId
 }
 
 Ref: teams.players > users._id
@@ -106,3 +100,4 @@ Ref: teamRequests.from - users._id
 Ref: matches.team1 - teams._id
 Ref: matches.team2 - teams._id
 Ref: matches.winner - teams._id
+Ref: token.user - users._id
