@@ -29,6 +29,8 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "Already logged in", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_verified:
             return res.status(409).json({ meta: { message: "Already verified", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.verification_code_already_sent:
+            return res.status(409).json({ meta: { message: "Verification code already sent", date: Date.now(), status: 409, error: err.message } });
         // saveErrorToDabase(err, timeOfError);
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });

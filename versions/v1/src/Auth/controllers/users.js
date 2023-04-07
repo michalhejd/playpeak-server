@@ -87,16 +87,19 @@ router.post("/resendVerification", async (req, res) => {
     if(!user) throw new Error(responseErrors.user_not_found);
     if(user.verified) throw new Error(responseErrors.already_verified);
 
-    const code = generateVerificationCode();
+    const code = await Code.findOne({ sentToUser: user._id });
+    if(code) throw new Error(responseErrors.verification_code_already_sent);
+
+    const newCode = generateVerificationCode();
 
     const verificationCode = new Code({
-        code: code,
+        code: newCode,
         sentToUser: user._id
     });
 
     await verificationCode.save();
 
-    sendEmail(user, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
+    sendEmail(user, newCode, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
     handleSuccess(res, responseSuccess.verification_email_sent);
 });
 

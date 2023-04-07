@@ -14,6 +14,7 @@ export const responseErrors = {
     already_verified: "already_verified",
     code_not_found: "code_not_found",
     bad_code: "bad_code",
+    verification_code_already_sent: "verification_code_already_sent",
 };
 
 export const responseSuccess = {
