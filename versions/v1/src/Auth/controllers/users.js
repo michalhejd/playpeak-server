@@ -283,13 +283,12 @@ router.put("/:id", async (req, res) => {
 });
 
 router.patch("/verify", async (req, res) => {
-    console.log("gere");
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     // check if body contains email and if email is in correct format
 
-    if (!body.email) throw new Error(responseErrors.bad_format);
-    if (!body.code) throw new Error(responseErrors.bad_format);
+    if (typeof body.email !== "string") throw new Error(responseErrors.bad_format);
+    if (typeof body.code !== "string") throw new Error(responseErrors.bad_format);
     const user = await User.findOne({ email: body.email });
     if (!user) throw new Error(responseErrors.user_not_found);
     // check if user is verified
@@ -298,10 +297,15 @@ router.patch("/verify", async (req, res) => {
     const code = await Code.findOne({ sentToUser: user._id });
     if (!code) throw new Error(responseErrors.code_not_found);
     if (code.code !== body.code) throw new Error(responseErrors.bad_code);
-
+    try{
     user.verified = true;
     await user.save();
-    await code.delete();
+
+    //delete code
+    
     handleSuccess(res, responseSuccess.user_verified);
+    }catch(err){
+        console.log(err);
+    }
 });
 export default router;
