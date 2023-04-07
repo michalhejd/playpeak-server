@@ -7,7 +7,7 @@ import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
 import { verifyUserParams } from "../utils/verifyUser.js";
-import { formatUsers } from "../utils/getFormatter.js";
+import { formatUsers, formatUser } from "../utils/getFormatter.js";
 import { Password } from "../utils/Password.js";
 import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
@@ -157,8 +157,6 @@ router.delete("/logout", async (req, res) => {
 });
 
 
-
-
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
@@ -168,11 +166,11 @@ router.get("/", async (req, res) => {
     const query = req.query;
     //maximum users per page
     const maxUsersPerPage = 2;
-    //calc of max pages (from total User documents in db)
+    // calc of max pages (from total User documents in db)
     const maxPages = Math.ceil(await User.countDocuments() / maxUsersPerPage);
-    //check if page can be returned (if page number is not greater than maxPages and if page is not less than 1) otherwise return first page
+    // check if page can be returned (if page number is not greater than maxPages and if page is not less than 1) otherwise return first page
     const page = query.page ? ((parseInt(query.page) > 0) ? ((parseInt(query.page) <= maxPages) ? parseInt(query.page) : 1) : 1) : 1;
-    //check if sort is string
+    // check if sort is string
     if (typeof query.sort == "string") {
         //check which value of sort is requested otherwise not to sort
         if (query.sort == "newest") {
@@ -182,23 +180,47 @@ router.get("/", async (req, res) => {
             query.sort = { _id: 1 };
         }
     }
-    //create users const and then call func which will format users(it will return users without their password and __v)
+    // create users const and then call func which will format users(it will return users without their password and __v)
     const users = formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
-    //return param which will tell user on which page he is
+    // return param which will tell user on which page he is
     const currentPage = page;
     handleSuccess(res, responseSuccess.users_found, { users, maxPages, currentPage });
 });
 
+router.get("/@self", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    // pass to function which will check if user exists and if user is verified
+    const user = await verifyUserParams(req.user);
+    console.log(formatUser(user));
+    // return user without his password and __v
+    handleSuccess(res, responseSuccess.user_found, formatUser(user));
+});
+
+router.get("/:id", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    // pass to function which will check if user exists and if user is verified
+    console.log(req.user);
+    const user = await verifyUserParams(req.user)
+    if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
+    // get id from params
+    const id = req.params.id;
+    // check if id is in correct format
+    if (!Verify.id(id)) throw new Error(responseErrors.bad_format);
+    // check if user exists
+    const userFound = await User.findById(id);
+    if (!userFound) throw new Error(responseErrors.user_not_found);
+    // return user without his password and __v
+    handleSuccess(res, responseSuccess.user_found, formatUser(userFound));
+});
+
+
 router.put("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-
 
     //func that verifies if user exists and if user is verified
     const user = await verifyUserParams(req.user)
 
-
     const body = req.body;
-
 
     //if body contains oldPassword and newPassword then it checks if oldPassword is correct and if newPassword is in correct format
     if (body.oldPassword && body.newPassword) {
@@ -214,7 +236,6 @@ router.put("/@self", async (req, res) => {
         if (!Verify.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
         user.nickname = body.nickname;
     }
-
 
     //save user
     await user.save();

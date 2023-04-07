@@ -21,6 +21,7 @@ export const responseSuccess = {
     user_created: "user_created",
     login_success: "login_success",
     logout_success: "logout_success",
+    user_found: "user_found",
     users_found: "users_found",
     user_updated: "user_updated",
     user_verified: "user_verified"

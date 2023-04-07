@@ -1,4 +1,5 @@
 import { roles } from "../models/User.js";
+import mongoose from 'mongoose';
 export class Verify {
     //https://jsdoc.app/about-getting-started.html
     /**
@@ -83,6 +84,16 @@ export class Verify {
      */
     static verified(verified) {
         if (typeof verified !== 'boolean') return false;
+        return true
+    }
+
+    /**
+     *  
+     * @param {String} id
+     * @returns {Boolean} true if id is valid otherwise false
+     */
+    static id(id) {
+        if (!mongoose.Types.ObjectId.isValid(id)) return false;
         return true
     }
 }

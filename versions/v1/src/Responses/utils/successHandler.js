@@ -8,6 +8,9 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.users_found:
             res.status(200).json({ meta: { message: "Users found", status: 200 }, data: data });
             return;
+        case responseSuccess.user_found:
+            res.status(200).json({ meta: { message: "User found", status: 200 }, data: data });
+            return;
         case responseSuccess.user_updated:
             res.status(200).json({ meta: { message: "User updated", status: 200 } });
             return;

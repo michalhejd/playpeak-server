@@ -1,11 +1,17 @@
 import mongoose from "mongoose"
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
-export async function formatUser(user){
-    if(!user) throw new Error(responseErrors.server_error)
-    //ssps cajthaml discord
-    //deletes password and __v from user
-    const { password, __v, ...newUser } = user
-    return newUser
+export function formatUser(user){
+    if(!user) throw new Error(responseErrors.server_error);
+
+    const newUser = {};
+
+    for (let [key, value] of Object.entries(user._doc)) {
+        if(key != "password" && key != "__v"){
+            newUser[key] = value;
+        }
+    }
+
+    return newUser;
 }
 
 export function formatUsers(users){
