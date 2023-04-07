@@ -23,6 +23,9 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.user_verified:
             res.status(200).json({ meta: { message: "User verified", status: 200 } });
             return;
+        case responseSuccess.verification_email_sent:
+            res.status(200).json({ meta: { message: "Verification email sent", status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", status: 201 }, data: data });
             return;

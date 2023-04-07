@@ -13,7 +13,6 @@ import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
-import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -34,6 +33,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
+    if(req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     // verify if all params are in correct format => if they are string, number, date, their length etc.
     // function returns true if all params are in correct format, otherwise returns false
@@ -79,10 +79,25 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/resendVerification", async (req, res) => {
+    if(req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
-    // verify if email is in correct format
-    if (!Verify.email(body.email)) throw new Error(responseErrors.bad_format);
+    if(typeof body.email !== 'string') throw new Error(responseErrors.bad_format);
 
+    const user = await User.findOne({ email: body.email });
+    if(!user) throw new Error(responseErrors.user_not_found);
+    if(user.verified) throw new Error(responseErrors.already_verified);
+
+    const code = generateVerificationCode();
+
+    const verificationCode = new Code({
+        code: code,
+        sentToUser: user._id
+    });
+
+    await verificationCode.save();
+
+    sendEmail(user, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
+    handleSuccess(res, responseSuccess.verification_email_sent);
 });
 
 router.post("/", async (req, res) => {

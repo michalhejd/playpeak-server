@@ -24,5 +24,6 @@ export const responseSuccess = {
     user_found: "user_found",
     users_found: "users_found",
     user_updated: "user_updated",
-    user_verified: "user_verified"
+    user_verified: "user_verified",
+    verification_email_sent: "verification_email_sent",
 };
