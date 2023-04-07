@@ -2,7 +2,7 @@ import User from '../../versions/v1/src/Auth/models/User.js';
 import { roles } from '../../versions/v1/src/Auth/models/User.js';
 import {hashPassword} from '../../versions/v1/src/Auth/utils/hashPassword.js';
 
-export async function defaultOrganizer() {
+export async function defaultRoot() {
     if (!process.env.ADMIN_EMAIL) {
         console.log("ADMIN_EMAIL is not set in .env file")
         process.exit(0)

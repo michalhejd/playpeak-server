@@ -12,6 +12,7 @@ import { hashPassword } from "../utils/hashPassword.js";
 import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
+import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
 
 const router = express.Router();
 
@@ -66,11 +67,10 @@ router.post("/register", async (req, res) => {
     // save code to db
     await verificationCode.save();
     
-    
-    // vytvoření tokenu s kódem pro ověření emailu a uložení kódu do db a uložení uživatele do db
-    
     // save user to db
     await user.save();
+
+    sendEmail(user, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
 
     // odeslání emailu s kódem pro ověření emailu společně
     handleSuccess(res, responseSuccess.user_created);
