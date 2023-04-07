@@ -300,10 +300,19 @@ router.patch("/verify", async (req, res) => {
     if (code.code !== body.code) throw new Error(responseErrors.bad_code);
 
     user.verified = true;
+    user.expiresAt = null;
+
+    // remove code from database
+    try {
+        await Code.deleteOne({_id: code._id});
+    } catch (err) {
+         throw new Error(responseErrors.code_not_found);
+    }
     // save user with verified status
     await user.save();
-    // remove code from database
-    await Code.find({ id: code._id }).deleteOne();
+    
+
+    
 
     handleSuccess(res, responseSuccess.user_verified);
 });
