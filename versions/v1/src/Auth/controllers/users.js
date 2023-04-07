@@ -8,7 +8,7 @@ import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
 import { verifyUserParams } from "../utils/verifyUser.js";
 import { formatUsers } from "../utils/getFormatter.js";
-import { hashPassword } from "../utils/hashPassword.js";
+import { Password } from "../utils/Password.js";
 import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
@@ -22,14 +22,14 @@ router.post("/login", async (req, res) => {
     const body = req.body;
     // checking if email and password are in correct format
     if (!body.email || !body.password) throw new Error(responseErrors.bad_format);
-    const newUser = await User.findOne({ email: body.email })
+    const user = await User.findOne({ email: body.email })
     // checking if user exists
-    if (!newUser) throw new Error(responseErrors.user_not_found);
+    if (!user) throw new Error(responseErrors.user_not_found);
     // checking if password is correct
-    if (!await bcrypt.compare(body.password, newUser.password)) throw new Error(responseErrors.bad_credentials);
+    if (!await Password.verify(body.password, user.password)) throw new Error(responseErrors.bad_credentials);
     //checking if user is verified
-    verifyUserParams(newUser._id)
-    handleSuccess(res, responseSuccess.login_success, { token: signToken({ _id: newUser._id }) });
+    verifyUserParams(user._id)
+    handleSuccess(res, responseSuccess.login_success, { token: signToken({ _id: user._id }) });
 });
 
 router.post("/register", async (req, res) => {
@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
     if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
 
     // hash user password
-    const hashedPassword = await hashPassword(body.password);
+    const hashedPassword = await Password.hash(body.password);
 
 
     // create user instance
@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
     if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
 
     // hash user password
-    const hashedPassword = await hashPassword(body.password);
+    const hashedPassword = await Password.hash(body.password);
 
     const newUser = new User({
         email: body.email,
@@ -136,22 +136,24 @@ router.post("/", async (req, res) => {
         verified: body.verified || false
     });
 
-    const code = generateVerificationCode();
-
-    const verificationCode = new Code({
-        code: code,
-        sentToUser: newUser._id
-    });
-
-    // save code to db
-    await verificationCode.save();
-
+    
     // save user to db
     await newUser.save();
 
-    // send email with code
-    sendEmail(newUser, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
+    if (!newUser.verified) {
+        const code = generateVerificationCode();
 
+        const verificationCode = new Code({
+            code: code,
+            sentToUser: newUser._id
+        });
+
+        // save code to db
+        await verificationCode.save();
+        // send email with code if user is not verified
+        sendEmail(newUser, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
+    }
+    
     handleSuccess(res, responseSuccess.user_created);
 })
 
@@ -198,10 +200,10 @@ router.put("/@self", async (req, res) => {
 
     //if body contains oldPassword and newPassword then it checks if oldPassword is correct and if newPassword is in correct format
     if (body.oldPassword && body.newPassword) {
-        if (!await bcrypt.compare(body.oldPassword, user.password)) throw new Error(responseErrors.bad_credentials);
+        if (!await Password.verify(body.oldPassword, user.password)) throw new Error(responseErrors.bad_credentials);
         if (!Verify.password(body.newPassword)) throw new Error(responseErrors.bad_format);
         //hashes new password
-        user.password = await hashPassword(body.newPassword);
+        user.password = await Password.hash(body.newPassword);
     }
 
     //check if body contains nickname and if new nickname is not matching with old nickname
@@ -284,15 +286,15 @@ router.patch("/verify", async (req, res) => {
     const body = req.body;
     //check if body contains email and if email is in correct format
     if (!body.email) throw new Error(responseErrors.bad_format);
-    if(!body.code) throw new Error(responseErrors.bad_format);
+    if (!body.code) throw new Error(responseErrors.bad_format);
     const user = await User.findOne({ email: body.email });
     if (!user) throw new Error(responseErrors.user_not_found);
     //check if user is verified
     if (user.verified) throw new Error(responseErrors.already_verified);
 
-    const code = await Code.findOne({ user: user._id});
-    if(!code) throw new Error(responseErrors.code_not_found);
-    if(code.code !== body.code) throw new Error(responseErrors.bad_code);
+    const code = await Code.findOne({ user: user._id });
+    if (!code) throw new Error(responseErrors.code_not_found);
+    if (code.code !== body.code) throw new Error(responseErrors.bad_code);
 
     user.verified = true;
     await user.save();

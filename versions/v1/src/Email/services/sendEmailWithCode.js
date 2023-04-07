@@ -9,14 +9,12 @@ export async function sendEmail(user, code, url) {
     const name = user.name
     //split name and surname
     const sName = name.split(" ")[0]
-    const sSurname = name.split(" ")[1]
 
     //get vokativ of name and surname
     const voName = vokativ(sName, isWoman(sName))
-    const voSurname = vokativ(sSurname, isWoman(sSurname))
 
     //final name with vokativ and uppercase first letter
-    const finalName = voName.charAt(0).toUpperCase() + voName.slice(1) + " " + voSurname.charAt(0).toUpperCase() + voSurname.slice(1)
+    const finalName = voName.charAt(0).toUpperCase() + voName.slice(1)
     try {
     //transporter settings
     const transporter = nodemailer.createTransport({
@@ -39,9 +37,7 @@ export async function sendEmail(user, code, url) {
     //send email
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
+            throw new Error(responseErrors.server_error)
         }
     });
     } catch (err) {

@@ -1,6 +1,6 @@
 import User from '../../versions/v1/src/Auth/models/User.js';
 import { roles } from '../../versions/v1/src/Auth/models/User.js';
-import { hashPassword } from '../../versions/v1/src/Auth/utils/hashPassword.js';
+import { Password } from '../../versions/v1/src/Auth/utils/Password.js';
 
 export async function defaultRoot() {
     if (!process.env.ADMIN_EMAIL) {
@@ -12,7 +12,7 @@ export async function defaultRoot() {
     if (checkUser) return
     //create random password for organizer
     const password = Math.random().toString(36).slice(-8);
-    const hashedPassword = await hashPassword(password)
+    const hashedPassword = await Password.hash(password)
     try {
         const user = new User({
             email: email,
