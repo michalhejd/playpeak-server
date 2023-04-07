@@ -13,6 +13,7 @@ import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -297,15 +298,13 @@ router.patch("/verify", async (req, res) => {
     const code = await Code.findOne({ sentToUser: user._id });
     if (!code) throw new Error(responseErrors.code_not_found);
     if (code.code !== body.code) throw new Error(responseErrors.bad_code);
-    try{
-    user.verified = true;
-    await user.save();
 
-    //delete code
-    
+    user.verified = true;
+    // save user with verified status
+    await user.save();
+    // remove code from database
+    await Code.find({ id: code._id }).deleteOne();
+
     handleSuccess(res, responseSuccess.user_verified);
-    }catch(err){
-        console.log(err);
-    }
 });
 export default router;
