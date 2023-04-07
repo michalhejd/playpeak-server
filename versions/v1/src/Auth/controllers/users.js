@@ -80,23 +80,10 @@ router.post("/register", async (req, res) => {
 
 router.post("/resendVerification", async (req, res) => {
     const body = req.body;
-
     // verify if email is in correct format
     if (!Verify.email(body.email)) throw new Error(responseErrors.bad_format);
 
-
 });
-
-router.delete("/logout", async (req, res) => {
-    //check if user is logged in
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    const user = await User.findById(req.user);
-    //check if user exists
-    if (!user) throw new Error(responseErrors.cookies_unauthorized);
-    //sending response
-    handleSuccess(res, responseSuccess.logout_success);
-});
-
 
 router.post("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -157,7 +144,20 @@ router.post("/", async (req, res) => {
     }
     
     handleSuccess(res, responseSuccess.user_created);
-})
+});
+
+router.delete("/logout", async (req, res) => {
+    //check if user is logged in
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await User.findById(req.user);
+    //check if user exists
+    if (!user) throw new Error(responseErrors.cookies_unauthorized);
+    //sending response
+    handleSuccess(res, responseSuccess.logout_success);
+});
+
+
+
 
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -311,9 +311,6 @@ router.patch("/verify", async (req, res) => {
     // save user with verified status
     await user.save();
     
-
-    
-
     handleSuccess(res, responseSuccess.user_verified);
 });
 export default router;
