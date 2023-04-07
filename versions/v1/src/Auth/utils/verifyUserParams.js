@@ -56,6 +56,12 @@ export class Verify {
         if (typeof birthdate !== 'string') return false;
         const date = new Date(birthdate);
         if (date == 'Invalid Date') return false;
+        // birthdate must be in format yyyy-mm-dd => 10 characters
+        if (birthdate.length !== 10) return false;
+        // user must be older than 13 years (src: https://stackoverflow.com/questions/37002681/subtract-days-months-years-from-a-date-in-javascript)
+        const dateNow = new Date();
+        dateNow.setFullYear(dateNow.getFullYear() - 13);
+        if (date > dateNow) return false;
         return true
     }
 
