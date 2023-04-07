@@ -13,10 +13,3 @@ export function verifyRegisterBody(email, nickname, name, password, birthdate) {
     if (!Verify.birthdate(birthdate)) { return false; }
     return true;
 }
-
-
-export function regexMail(email) {
-    const emailRegexp = /^[\w\._-]+@(skola\.)?ssps\.cz$/
-    return emailRegexp.test(email);
-}
-

@@ -1,5 +1,6 @@
 import { roles } from "../models/User.js";
 import mongoose from 'mongoose';
+import { regexList, verifyRomanCzech } from "./regexParams.js";
 export class Verify {
     //https://jsdoc.app/about-getting-started.html
     /**
@@ -10,7 +11,8 @@ export class Verify {
     static nickname(nickname) {
         if (typeof nickname !== 'string') return false;
         if (nickname.length < 3 || nickname.length > 32) return false;
-        return true
+        if (!verifyRomanCzech(nickname, regexList.nickname)) return false;
+        return true;
     }
 
     /**
@@ -21,7 +23,8 @@ export class Verify {
     static name(name) {
         if (typeof name !== 'string') return false;
         if (name.length < 5 || name.length > 64) return false;
-        return true
+        if (!verifyRomanCzech(name, regexList.name)) return false;
+        return true;
     }
 
     /**
@@ -32,7 +35,8 @@ export class Verify {
     static password(password) {
         if (typeof password !== 'string') return false;
         if (password.length < 6 || password.length > 64) return false;
-        return true
+        if (!regexList.password.test(password)) return false;
+        return true;
     }
 
     /**
@@ -44,8 +48,7 @@ export class Verify {
         if (typeof email !== 'string') return false;
         if (email.length < 6 || email.length > 64) return false;
         if(process.env.NODE_ENV == 'development') return true;
-        const emailRegexp = /^[\w\._-]+@(skola\.)?ssps\.cz$/
-        return emailRegexp.test(email);
+        return regexList.email.test(email);
     }
 
     /**
@@ -63,7 +66,7 @@ export class Verify {
         const dateNow = new Date();
         dateNow.setFullYear(dateNow.getFullYear() - 13);
         if (date > dateNow) return false;
-        return true
+        return true;
     }
 
     /**
@@ -74,7 +77,7 @@ export class Verify {
     static role(role) {
         if (typeof role !== 'number') return false;
         if (!Object.values(roles).includes(role)) return false;
-        return true
+        return true;
     }
 
     /**
@@ -84,7 +87,7 @@ export class Verify {
      */
     static verified(verified) {
         if (typeof verified !== 'boolean') return false;
-        return true
+        return true;
     }
 
     /**
@@ -94,6 +97,6 @@ export class Verify {
      */
     static id(id) {
         if (!mongoose.Types.ObjectId.isValid(id)) return false;
-        return true
+        return true;
     }
 }
