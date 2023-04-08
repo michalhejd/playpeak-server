@@ -6,7 +6,7 @@ export function formatUser(user){
     const newUser = {};
 
     for (let [key, value] of Object.entries(user._doc)) {
-        if(key != "password" && key != "__v"){
+        if(key != "password" && key != "__v" && key != "expiresAt"){
             newUser[key] = value;
         }
     }
@@ -22,7 +22,7 @@ export function formatUsers(users){
     users.map(user => {
         //ssps cajthaml discord
         //deletes password and __v from user
-        const { password, __v, ...newUser } = user
+        const { password, __v, expiresAt, ...newUser } = user
         //pushes user to newUsers
         newUsers.push(newUser)
     })

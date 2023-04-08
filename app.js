@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import morgan from "morgan";
 import mongoose from 'mongoose';
+import swagger from './docs/swagger/swagger.js';
 import v1 from "./versions/v1/router.js";
 import { checkEnvironments } from './config/utils/checkEnvironments.js';
 import { defaultRoot } from './config/utils/createDefaultRootUser.js';
@@ -29,7 +30,7 @@ app.use(express.json())
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-
+app.use(swagger)
 
 app.use("/api/v1", v1);
 
