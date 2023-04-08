@@ -13,6 +13,7 @@ import { Verify } from "../utils/verifyUserParams.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
+import { emailLimiter } from "../../RateLimit/services/ratelimit.js";
 
 const router = express.Router();
 
@@ -381,7 +382,7 @@ router.post("/login", async (req, res) => {
 *          500:
 *              description: Internal server error.
 */
-router.post("/register", async (req, res) => {
+router.post("/register", emailLimiter, async (req, res) => {
     if(req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     // verify if all params are in correct format => if they are string, number, date, their length etc.
@@ -470,7 +471,7 @@ router.post("/register", async (req, res) => {
 *          500:
 *              description: Internal server error.
 */
-router.post("/resendVerification", async (req, res) => {
+router.post("/resendVerification", emailLimiter,  async (req, res) => {
     if(req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     if(typeof body.email !== 'string') throw new Error(responseErrors.bad_format);
@@ -556,7 +557,7 @@ router.post("/resendVerification", async (req, res) => {
  *                      
  */
 
-router.post("/", async (req, res) => {
+router.post("/", emailLimiter, async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if his account is verified
     const user = await verifyUserParams(req.user)
@@ -884,7 +885,7 @@ router.put("/:id", async (req, res) => {
  * 
  */ 
 
-router.patch("/verify", async (req, res) => {
+router.patch("/verify", emailLimiter, async (req, res) => {
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     // check if body contains email and if email is in correct format
@@ -963,7 +964,7 @@ router.patch("/verify", async (req, res) => {
  *              description: Internal server error
  */ 
 
-router.patch("/verify/:id", async (req, res) => {
+router.patch("/verify/:id", emailLimiter, async (req, res) => {
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const params = req.params;
     if(typeof params.id !== "string") throw new Error(responseErrors.bad_format);

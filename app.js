@@ -10,6 +10,7 @@ import swagger from './docs/swagger/swagger.js';
 import v1 from "./versions/v1/router.js";
 import { checkEnvironments } from './config/utils/checkEnvironments.js';
 import { defaultRoot } from './config/utils/createDefaultRootUser.js';
+import { globalLimiter } from './versions/v1/src/RateLimit/services/ratelimit.js';
 
 config();
 
@@ -29,6 +30,8 @@ app.use(cors());
 app.use(express.json())
 app.use(cookieParser());
 app.use(morgan('dev'));
+
+app.use(globalLimiter)
 
 app.use(swagger)
 
