@@ -12,7 +12,7 @@ export function handleSuccess(res, response, data) {
             res.status(200).json({ meta: { message: "User found", date: Date.now(), status: 200 }, data: data });
             return;
         case responseSuccess.user_updated:
-            res.status(200).json({ meta: { message: "User updated", date: Date.now(), date: Date.now(), status: 200 } });
+            res.status(200).json({ meta: { message: "User updated", date: Date.now(), status: 200 } });
             return;
         case responseSuccess.login_success:
             res.cookie("token", data.token, { httpOnly: true }).status(200).json({ meta: { message: "Login successful", date: Date.now(), status: 200 } });
