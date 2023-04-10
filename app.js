@@ -11,10 +11,18 @@ import v1 from "./versions/v1/router.js";
 import { checkEnvironments } from './config/utils/checkEnvironments.js';
 import { defaultRoot } from './config/utils/createDefaultRootUser.js';
 import { globalLimiter } from './versions/v1/src/RateLimit/services/ratelimit.js';
+import { checkVerisons } from './config/utils/checkVersions.js';
 
 config();
 
+checkVerisons()
 checkEnvironments()
+
+
+if(process.versions.node < 16){
+    console.log("Node version is too old, please update to 16.0.0 or higher")
+    process.exit(0)
+}
 
 mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
 }).then(() => {
