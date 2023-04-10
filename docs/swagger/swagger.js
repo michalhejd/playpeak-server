@@ -9,7 +9,7 @@ const options = {
         openapi: '3.0.0',
         info: {
             title: 'SSPŠ GAMING API',
-            version: '1.0.0',
+            version: process.env.npm_package_version,
             description: 'SSPŠ GAMING API',
         },
         host: 'localhost:3000',
@@ -27,7 +27,7 @@ const options = {
             }
         ]
     },
-    apis: ['./versions/v1/src/Auth/controllers/users.js', './versions/v1/src/Auth/models/User.js'],
+    apis: ['./docs/swagger/users/endpoints.js', './docs/swagger/users/models.js', './docs/swagger/components.js'],
 
 };
 
