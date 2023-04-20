@@ -1,6 +1,6 @@
-import User from '../../versions/v1/src/Auth/models/User.js';
-import { roles } from '../../versions/v1/src/Auth/models/User.js';
-import { Password } from '../../versions/v1/src/Auth/utils/Password.js';
+import User from '../../versions/v1/src/Users/models/User.js';
+import { roles } from '../../versions/v1/src/Users/models/User.js';
+import { Password } from '../../versions/v1/src/Users/utils/Password.js';
 
 export async function defaultRoot() {
     if (!process.env.ADMIN_EMAIL) {
@@ -22,7 +22,8 @@ export async function defaultRoot() {
             birthdate: new Date(),
             // setting to highest role -> root, this role can only be reached by this User
             role: roles.root,
-            verified: true
+            verified: true,
+            expiresAt: null
         })
         await user.save()
         console.log("Default organizer created with \nEmail: " + process.env.ADMIN_EMAIL + "\nPassword: " + password)
