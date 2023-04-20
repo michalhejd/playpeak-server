@@ -7,7 +7,7 @@ router.use(async (req, res, next) => {
     if (req.cookies.token) {
       jwt.verify(req.cookies.token, process.env.JWT, (err, decoded) => {
         if (err) {
-          throw next(new Error(responseErrors.cookies_unauthorized));
+          throw next(new Error(responseErrors.token_unauthorized));
         }
         req.user = decoded._id;
         next();

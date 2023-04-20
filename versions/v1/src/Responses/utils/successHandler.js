@@ -15,10 +15,10 @@ export function handleSuccess(res, response, data) {
             res.status(200).json({ meta: { message: "User updated", date: Date.now(), status: 200 } });
             return;
         case responseSuccess.login_success:
-            res.cookie("token", data.token, { httpOnly: true }).status(200).json({ meta: { message: "Login successful", date: Date.now(), status: 200 } });
+            res.status(200).json({ meta: { message: "Login successful", date: Date.now(), status: 200 }, data: data });
             return;
         case responseSuccess.logout_success:
-            res.clearCookie("token").status(200).json({ meta: { message: "Logout successful", date: Date.now(), status: 200 } });
+            res.status(200).json({ meta: { message: "Logout successful", date: Date.now(), status: 200 }, data: data });
             return;
         case responseSuccess.user_verified:
             res.status(200).json({ meta: { message: "User verified", date: Date.now(), status: 200 } });

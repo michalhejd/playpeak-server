@@ -1,9 +1,12 @@
 export const responseErrors = {
     bad_format: "bad_format",
+    bad_format_email: "bad_format_email",
+    bad_format_password: "bad_format_password",
+    bad_format_email_password: "bad_format_email_password",
     unauthorized: "unauthorized",
     bad_credentials: "bad_credentials",
     forbidden: "forbidden",
-    cookies_unauthorized: "cookies_unauthorized",
+    token_unauthorized: "token_unauthorized",
     already_logged_in: "already_logged_in",
     user_not_found: "user_not_found",
     email_already_exists: "email_already_exists",

@@ -37,6 +37,9 @@ export async function checkEnvironments(){
     if(!process.env.EMAIL_VERIFICATION_URL){
         missingEnvironments.push("EMAIL_VERIFICATION_URL")
     }
+    if(!process.env.ORIGIN){
+        missingEnvironments.push("ORIGIN")
+    }
     if(missingEnvironments.length > 0){
         console.log("Missing environments: " + missingEnvironments.join(", "))
         return process.exit(0)

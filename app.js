@@ -34,7 +34,10 @@ mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
 await defaultRoot()
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://127.0.0.1:5174',
+    credentials: true
+}));
 app.use(express.json())
 app.use(cookieParser());
 app.use(morgan('dev'));
