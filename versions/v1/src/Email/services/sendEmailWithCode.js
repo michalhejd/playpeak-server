@@ -29,7 +29,7 @@ export async function sendEmail(user, code, url) {
     console.log("Sending email to " + user.email)
     //mail options
     const mailOptions = {
-        from: "info@h3jduk.cz",
+        from: process.env.EMAIL_USER,
         to: user.email,
         subject: 'Verifikace emailu',
         html: verificationTemplate(finalName, code, url)

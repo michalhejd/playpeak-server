@@ -63,7 +63,6 @@ router.get("/@self", async (req, res) => {
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
-    console.log(req.user);
     const user = await verifyUserParams(req.user)
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
     // get id from params

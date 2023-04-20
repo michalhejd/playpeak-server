@@ -6,7 +6,8 @@ const tournamentSchema = new Schema({
         type: String,
         required: true,
         minLength: 3,
-        maxLength: 64
+        maxLength: 64,
+        unique: true
     },
     organizer: {
         type: Schema.Types.ObjectId,
@@ -21,6 +22,7 @@ const tournamentSchema = new Schema({
     },
     startDate: {
         type: Date,
+        startNow: true,
         required: true
     },
     endDate: {
