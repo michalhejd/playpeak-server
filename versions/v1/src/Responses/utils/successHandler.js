@@ -26,8 +26,17 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.verification_email_sent:
             res.status(200).json({ meta: { message: "Verification email sent", date: Date.now(), status: 200 } });
             return;
+        case responseSuccess.games_found:
+            res.status(200).json({ meta: { message: "Games found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.game_updated:
+            res.status(200).json({ meta: { message: "Game updated", date: Date.now(), status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
+            return;
+        case responseSuccess.game_created:
+            res.status(201).json({ meta: { message: "Game successfully created", date: Date.now(), status: 201 }, data: data });
             return;
         default:
             res.status(500).json({ meta: { message: "Internal server error", date: Date.now(), status: 500 } });

@@ -18,12 +18,6 @@ config();
 checkVerisons()
 checkEnvironments()
 
-
-if(process.versions.node < 16){
-    console.log("Node version is too old, please update to 16.0.0 or higher")
-    process.exit(0)
-}
-
 mongoose.connect(process.env.DB || "mongodb://localhost:27017/ssps", {
 }).then(() => {
     console.log("Connected to db");

@@ -18,6 +18,8 @@ export const responseErrors = {
     code_not_found: "code_not_found",
     bad_code: "bad_code",
     verification_code_already_sent: "verification_code_already_sent",
+    slug_taken: "slug_taken",
+    game_not_found: "game_not_found"
 };
 
 export const responseSuccess = {
@@ -30,4 +32,7 @@ export const responseSuccess = {
     user_updated: "user_updated",
     user_verified: "user_verified",
     verification_email_sent: "verification_email_sent",
+    game_created: "game_created",
+    games_found: "games_found",
+    game_updated: "game_updated",
 };

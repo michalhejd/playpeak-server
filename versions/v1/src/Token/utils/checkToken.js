@@ -4,8 +4,11 @@ import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 
 const router = express.Router();
 router.use(async (req, res, next) => {
-    if (req.cookies.token) {
-      jwt.verify(req.cookies.token, process.env.JWT, (err, decoded) => {
+    const bearerHeader = req.headers["authorization"];
+    if (bearerHeader) {
+      const bearer = bearerHeader.split(" ");
+      const bearerToken = bearer[1];
+      jwt.verify(bearerToken, process.env.JWT, (err, decoded) => {
         if (err) {
           throw next(new Error(responseErrors.token_unauthorized));
         }

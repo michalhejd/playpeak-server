@@ -24,8 +24,9 @@ const gameSchema = new Schema({
         type: String,
         required: true,
         minLength: 3,
-        maxLength: 32
+        maxLength: 32,
+        unique: true
     }
 });
 
-export default moggose.model('Game', gameSchema, 'games');
+export default mongoose.model('Game', gameSchema, 'games');

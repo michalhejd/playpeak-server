@@ -25,6 +25,8 @@ export function handleErr(err, req, res, next) {
             return res.status(404).json({ meta: { message: "User not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.code_not_found:
             return res.status(404).json({ meta: { message: "Code not found, you have to resend your verification code", date: Date.now(), status: 404, error: err.message } });
+        case responseErrors.game_not_found:
+            return res.status(404).json({ meta: { message: "Game not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.already_logged_in:
             return res.status(409).json({ meta: { message: "Already logged in", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_verified:
@@ -37,6 +39,8 @@ export function handleErr(err, req, res, next) {
         case responseErrors.nickname_already_exists:
             return res.status(409).json({ meta: { message: "Nickname already exists", date: Date.now(), status: 409, error: err.message } });
         // saveErrorToDabase(err, timeOfError);
+        case responseErrors.slug_taken:
+            return res.status(409).json({ meta: { message: "Slug already taken", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         default:

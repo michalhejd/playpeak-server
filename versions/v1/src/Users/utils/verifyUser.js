@@ -7,7 +7,7 @@ export async function verifyUserParams(id){
     //find user in db by id
     const user = await User.findOne({_id: id});
     //check if user exists
-    if(!user) throw new Error(responseErrors.cookies_unauthorized);
+    if(!user) throw new Error(responseErrors.token_unauthorized);
     //check if user is verified otherwise return that he is not verified
     if(user.verified == false) throw new Error(responseErrors.not_verified);
     return user;

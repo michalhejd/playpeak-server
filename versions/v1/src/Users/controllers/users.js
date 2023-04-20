@@ -378,7 +378,7 @@ router.delete("/logout", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await User.findById(req.user);
     //check if user exists
-    if (!user) throw new Error(responseErrors.cookies_unauthorized);
+    if (!user) throw new Error(responseErrors.token_unauthorized);
     //sending response
     handleSuccess(res, responseSuccess.logout_success);
 });
