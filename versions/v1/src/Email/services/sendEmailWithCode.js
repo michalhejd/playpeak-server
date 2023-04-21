@@ -1,8 +1,9 @@
 import {vokativ, isWoman} from "vokativ";
 import nodemailer from "nodemailer";
 import {config} from "dotenv"
-import { verificationTemplate } from "../models/Email.js";
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
+import hbs from "nodemailer-express-handlebars";
+import path from "path";
 config()
 
 export async function sendEmail(user, code, url) {
@@ -26,17 +27,36 @@ export async function sendEmail(user, code, url) {
             pass: process.env.EMAIL_PASS
         }
     });
+    //https://www.youtube.com/watch?v=RnA4TdTGy5I
+    const hbsOptions = {
+        viewEngine: {
+            extName: ".hbs",
+            partialsDir: "./versions/v1/src/Email/handlebars",
+            defaultLayout: false,
+        },
+        viewPath: "./versions/v1/src/Email/handlebars",
+        extName: ".hbs",
+    }
+
+    transporter.use("compile", hbs(hbsOptions))
+
     console.log("Sending email to " + user.email)
     //mail options
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
         subject: 'Verifikace emailu',
-        html: verificationTemplate(finalName, code, url)
+        template: "verification",
+        context: {
+            name: finalName,
+            code: code,
+            //url: url
+        }
     };
     //send email
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
+            console.log(error)
             throw new Error(responseErrors.server_error)
         }
     });
