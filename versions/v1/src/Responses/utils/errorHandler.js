@@ -27,6 +27,10 @@ export function handleErr(err, req, res, next) {
             return res.status(404).json({ meta: { message: "Code not found, you have to resend your verification code", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.game_not_found:
             return res.status(404).json({ meta: { message: "Game not found", date: Date.now(), status: 404, error: err.message } });
+        case responseErrors.team_not_found:
+            return res.status(404).json({ meta: { message: "Team not found", date: Date.now(), status: 404, error: err.message } });
+        case responseErrors.player_not_found:
+            return res.status(404).json({ meta: { message: "Player not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.already_logged_in:
             return res.status(409).json({ meta: { message: "Already logged in", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_verified:
@@ -38,9 +42,21 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "Email already exists", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.nickname_already_exists:
             return res.status(409).json({ meta: { message: "Nickname already exists", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.name_already_exists:
+            return res.status(409).json({ meta: { message: "Name already exists", date: Date.now(), status: 409, error: err.message } });
         // saveErrorToDabase(err, timeOfError);
         case responseErrors.slug_taken:
             return res.status(409).json({ meta: { message: "Slug already taken", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.already_has_team:
+            return res.status(409).json({ meta: { message: "You can`t have more than one team", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.already_in_team:
+            return res.status(409).json({ meta: { message: "You are already in a team", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.cant_remove_yourself:
+            return res.status(409).json({ meta: { message: "You can`t remove yourself", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.cant_leave_team_not_in:
+            return res.status(409).json({ meta: { message: "You can`t leave a team you are not in", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.cant_leave_your_team:
+            return res.status(409).json({ meta: { message: "You can`t leave your own team", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         default:

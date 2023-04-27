@@ -1,6 +1,6 @@
 import express from "express";
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
-import { verifyUserParams } from "../../Users/utils/verifyUser.js";
+import { checkUser } from "../../Users/services/checkUser.js";
 import { roles } from "../../Users/models/User.js";
 import { VerifyGame } from "../utils/verifyGameParams.js";
 import Game from "../models/Game.js";
@@ -12,7 +12,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //verify user params
-    await verifyUserParams(req.user)
+    await checkUser(req.user)
     //find all games in db
     const games = await Game.find();
     handleSuccess(res, responseSuccess.games_found, games);
@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     //check if user is superAdmin
     if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
 
@@ -48,7 +48,7 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
 
     const params = req.params;

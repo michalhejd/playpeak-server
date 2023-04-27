@@ -6,10 +6,10 @@ import { handleSuccess } from "../../Responses/utils/successHandler.js";
 import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
-import { verifyUserParams } from "../utils/verifyUser.js";
+import { checkUser } from "../services/checkUser.js";
 import { formatUsers, formatUser } from "../utils/getFormatter.js";
 import { Password } from "../utils/Password.js";
-import { Verify } from "../utils/verifyUserParams.js";
+import { Verify } from "../utils/verifyUser.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
@@ -21,7 +21,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
     //get of query params
     const query = req.query;
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
 router.get("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
-    const user = await verifyUserParams(req.user);
+    const user = await checkUser(req.user);
     console.log(formatUser(user));
     // return user without his password and __v
     handleSuccess(res, responseSuccess.user_found, formatUser(user));
@@ -63,7 +63,7 @@ router.get("/@self", async (req, res) => {
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
     // get id from params
     const id = req.params.id;
@@ -90,7 +90,7 @@ router.post("/login", async (req, res) => {
     // checking if password is correct
     if (!await Password.verify(body.password, user.password)) throw new Error(responseErrors.bad_credentials);
     //checking if user is verified
-    verifyUserParams(user._id)
+    await checkUser(user._id)
     handleSuccess(res, responseSuccess.login_success, { token: signToken({ _id: user._id }) });
 });
 
@@ -169,7 +169,7 @@ router.post("/resendVerification", emailLimiter,  async (req, res) => {
 router.post("/", emailLimiter, async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if his account is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     // check if user is at least admin
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
 
@@ -231,7 +231,7 @@ router.put("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
 
     //func that verifies if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
 
     const body = req.body;
 
@@ -259,7 +259,7 @@ router.put("/@self", async (req, res) => {
 router.put("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
-    const user = await verifyUserParams(req.user)
+    const user = await checkUser(req.user)
     //check if user isn't player
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
 

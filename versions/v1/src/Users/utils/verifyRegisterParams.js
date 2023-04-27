@@ -1,4 +1,4 @@
-import { Verify } from "./verifyUserParams.js"
+import { Verify } from "./verifyUser.js"
 
 export function verifyRegisterBody(email, nickname, name, password, birthdate) {
     // verify email

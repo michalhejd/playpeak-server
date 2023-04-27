@@ -8,19 +8,13 @@ const teamSchema = new Schema({
         minLength: 3,
         maxLength: 32
     },
-    shortName: {
-        type: String,
-        required: true,
-        minLength: 1,
-        maxLength: 3
-    },
     // array of players -> user ids
     players: {
         type: [Schema.Types.ObjectId],
         ref: 'User',
         required: true
     },
-    ownner: {
+    capitan: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -28,7 +22,6 @@ const teamSchema = new Schema({
     matches: {
         type: [Schema.Types.ObjectId],
         ref: 'Match',
-        required: false
     },
     invitations: {
         type: Boolean,

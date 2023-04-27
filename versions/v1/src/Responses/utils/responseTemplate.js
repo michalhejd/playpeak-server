@@ -11,6 +11,7 @@ export const responseErrors = {
     user_not_found: "user_not_found",
     email_already_exists: "email_already_exists",
     nickname_already_exists: "nickname_already_exists",
+    name_already_exists: "name_already_exists",
     server_error: "server_error",
     not_verified: "not_verified",
     change_password: "change_password",
@@ -19,7 +20,14 @@ export const responseErrors = {
     bad_code: "bad_code",
     verification_code_already_sent: "verification_code_already_sent",
     slug_taken: "slug_taken",
-    game_not_found: "game_not_found"
+    game_not_found: "game_not_found",
+    team_not_found: "team_not_found",
+    already_has_team: "already_has_team",
+    already_in_team: "already_in_team",
+    cant_remove_yourself: "cant_remove_yourself",
+    player_not_found: "player_not_found",
+    cant_leave_team_not_in: "cant_leave_team_not_in",
+    cant_leave_your_team: "cant_leave_your_team",
 };
 
 export const responseSuccess = {
@@ -35,4 +43,11 @@ export const responseSuccess = {
     game_created: "game_created",
     games_found: "games_found",
     game_updated: "game_updated",
+    teams_found: "teams_found",
+    team_found: "team_found",
+    team_created: "team_created",
+    team_updated: "team_updated",
+    team_deleted: "team_deleted",
+    team_players_found: "team_players_found",
+    team_left: "team_left",
 };

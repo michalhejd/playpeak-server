@@ -32,11 +32,35 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.game_updated:
             res.status(200).json({ meta: { message: "Game updated", date: Date.now(), status: 200 } });
             return;
+        case responseSuccess.teams_found:
+            res.status(200).json({ meta: { message: "Teams found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.team_found:
+            res.status(200).json({ meta: { message: "Team found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.team_updated:
+            res.status(200).json({ meta: { message: "Team updated", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.team_deleted:
+            res.status(200).json({ meta: { message: "Team deleted", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.team_players_found:
+            res.status(200).json({ meta: { message: "Team players found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.team_player_removed:
+            res.status(200).json({ meta: { message: "Team player removed", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.team_left:
+            res.status(200).json({ meta: { message: "Team left", date: Date.now(), status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
             return;
         case responseSuccess.game_created:
             res.status(201).json({ meta: { message: "Game successfully created", date: Date.now(), status: 201 }, data: data });
+            return;
+        case responseSuccess.team_created:
+            res.status(201).json({ meta: { message: "Team successfully created", date: Date.now(), status: 201 }, data: data });
             return;
         default:
             res.status(500).json({ meta: { message: "Internal server error", date: Date.now(), status: 500 } });

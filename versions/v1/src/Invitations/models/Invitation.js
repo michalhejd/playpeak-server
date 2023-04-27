@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
+export const invType = {
+    invation: 'invation',
+    request: 'request'
+}
+
 const invitationSchema = new Schema({
     team: {
         type: Schema.Types.ObjectId,
@@ -18,7 +23,12 @@ const invitationSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'User'
-    }
+    },
+    type: {
+        type: String,
+        required: true,
+        enum: Object.values(invType)
+    },
 });
 
 export default mongoose.model('Invitation', invitationSchema, 'invitations');
