@@ -17,6 +17,15 @@ router.get("/", async (req, res) => {
     handleSuccess(res, responseSuccess.teams_found, teams)
 })
 
+router.get("/@my", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    //check if user exists and if user is verified
+    const user = await checkUser(req.user)
+    const team = await Team.findOne({ players: user._id})
+    if(!team) throw new Error(responseErrors.team_not_found)
+    handleSuccess(res, responseSuccess.team_found, team)
+})
+
 //get team by id
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);

@@ -4,6 +4,7 @@ const router = express.Router()
 
 //invite player to team
 router.post("/:id/invite", async (req, res) => {
+
 })
 
 //request to join team
