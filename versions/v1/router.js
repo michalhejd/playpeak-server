@@ -10,7 +10,6 @@ const router = express.Router()
 
 router.use(checkToken)
 
-
 router.use("/", server)
 router.use("/users", users);
 router.use("/games", games);
