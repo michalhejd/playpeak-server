@@ -68,6 +68,12 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.requests_found:
             res.status(200).json({ meta: { message: "Requests found", date: Date.now(), status: 200 }, data: data });
             return;
+        case responseSuccess.invitation_declined:
+            res.status(200).json({ meta: { message: "Invitation declined", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.invitation_accepted:
+            res.status(200).json({ meta: { message: "Invitation accepted", date: Date.now(), status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
             return;

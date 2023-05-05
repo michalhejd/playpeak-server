@@ -156,6 +156,7 @@ router.post("/:id/invite", async (req, res) => {
     //check if team exists
     const team = await Team.findById(params.id)
     if (!team) throw new Error(responseErrors.team_not_found)
+    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full)
     if(team.invitations !== true && team.capitan !== user._id) throw new Error(responseErrors.invitations_disabled)
     const body = req.body
     // id of user to invite
@@ -183,6 +184,7 @@ router.post("/:id/request", async (req, res) => {
     const team = await Team.findById(params.id)
     if (!team) throw new Error(responseErrors.team_not_found)
     if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team)
+    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full)
     if(await Invitation.find({toUser: user._id, team: params.id})) throw new Error(responseErrors.already_requested)
     const invitation = new Invitation({
         fromUser: user._id,
@@ -199,7 +201,10 @@ router.delete("/players/invitation/:id", async (req, res) => {
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
-    if(!await Invitation.findById(params.id)) throw new Error(responseErrors.invitation_not_found)
+    const invitation = await Invitation.findById(params.id)
+    if (!invitation) throw new Error(responseErrors.invitation_not_found)
+    if (invitation.toUser != user._id || invitation.fromUser != user._id) throw new Error(responseErrors.forbidden)
+    await Invitation.findByIdAndDelete(params.id)
     handleSuccess(res, responseSuccess.invitation_deleted)
 })
 
@@ -208,6 +213,15 @@ router.patch("/players/invitation/:id/accept", async (req, res) => {
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
+    const invitation = await Invitation.findById(params.id)
+    if (!invitation) throw new Error(responseErrors.invitation_not_found)
+    if (invitation.toUser != user._id) throw new Error(responseErrors.forbidden)
+    const team = await Team.findById(invitation.team)
+    if (!team) throw new Error(responseErrors.team_not_found)
+    if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team)
+    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full)
+    const usersTeam = await Team.find({ players: user._id })
+    if (usersTeam.capitan == user._id) throw new Error(responseErrors.already_in_team)
 })
 
 router.patch("/players/invitation/:id/decline", async (req, res) => {
@@ -215,6 +229,11 @@ router.patch("/players/invitation/:id/decline", async (req, res) => {
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
+    const invitation = await Invitation.findById(params.id)
+    if (!invitation) throw new Error(responseErrors.invitation_not_found)
+    if (invitation.toUser != user._id) throw new Error(responseErrors.forbidden)
+    await Invitation.findByIdAndDelete(params.id)
+    handleSuccess(res, responseSuccess.invitation_declined)
 })
 
 router.get("/@me/invitations", async (req, res) => {
@@ -233,15 +252,6 @@ router.get("/@me/requests", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
     const requests = await Invitation.find({toUser: user._id, type: invType.request})
     handleSuccess(res, responseSuccess.requests_found, requests)
-})
-
-
-
-router.get("/players/requests/:id", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    const user = await checkUser(req.user)
-    const params = req.params
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
 })
 
 

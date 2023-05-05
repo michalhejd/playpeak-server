@@ -63,6 +63,8 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "You have already invited this player", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_requested:
             return res.status(409).json({ meta: { message: "You have already requested to join this team", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.team_full:
+            return res.status(409).json({ meta: { message: "Team is full", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         default:

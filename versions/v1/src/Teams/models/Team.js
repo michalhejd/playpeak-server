@@ -14,6 +14,11 @@ const teamSchema = new Schema({
         ref: 'User',
         required: true
     },
+    maxPlayers: {
+        type: Number,
+        required: true,
+        default: 5
+    },
     capitan: {
         type: Schema.Types.ObjectId,
         ref: 'User',

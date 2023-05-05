@@ -32,6 +32,7 @@ export const responseErrors = {
     already_requested: "already_requested",
     invitation_not_found: "invitation_not_found",
     invitations_disabled: "invitations_disabled",
+    team_full: "team_full",
 };
 
 export const responseSuccess = {
@@ -59,4 +60,6 @@ export const responseSuccess = {
     invitation_deleted: "invitation_deleted",
     invitations_found: "invitations_found",
     requests_found: "requests_found",
+    invitation_declined: "invitation_declined",
+    invitation_accepted: "invitation_accepted",
 };
