@@ -21,6 +21,8 @@ export function handleErr(err, req, res, next) {
             return res.status(403).json({ meta: { message: "Not verified", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.change_password:
             return res.status(403).json({ meta: { message: "You need to change your password", date: Date.now(), status: 403, error: err.message } });
+        case responseErrors.invitations_disabled:
+            return res.status(403).json({ meta: { message: "Invitations are disabled", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.user_not_found:
             return res.status(404).json({ meta: { message: "User not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.code_not_found:
@@ -57,6 +59,10 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "You can`t leave a team you are not in", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.cant_leave_your_team:
             return res.status(409).json({ meta: { message: "You can`t leave your own team", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.already_invited:
+            return res.status(409).json({ meta: { message: "You have already invited this player", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.already_requested:
+            return res.status(409).json({ meta: { message: "You have already requested to join this team", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         default:

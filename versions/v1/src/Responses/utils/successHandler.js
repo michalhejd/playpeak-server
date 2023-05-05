@@ -53,6 +53,21 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.team_left:
             res.status(200).json({ meta: { message: "Team left", date: Date.now(), status: 200 } });
             return;
+        case responseSuccess.invitation_sent:
+            res.status(200).json({ meta: { message: "Invitation sent", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.request_sent:
+            res.status(200).json({ meta: { message: "Request sent", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.invitation_deleted:
+            res.status(200).json({ meta: { message: "Invitation deleted", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.invitations_found:
+            res.status(200).json({ meta: { message: "Invitations found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.requests_found:
+            res.status(200).json({ meta: { message: "Requests found", date: Date.now(), status: 200 }, data: data });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
             return;

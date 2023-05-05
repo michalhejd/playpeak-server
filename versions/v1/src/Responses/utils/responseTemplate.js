@@ -28,6 +28,10 @@ export const responseErrors = {
     player_not_found: "player_not_found",
     cant_leave_team_not_in: "cant_leave_team_not_in",
     cant_leave_your_team: "cant_leave_your_team",
+    already_invited: "already_invited",
+    already_requested: "already_requested",
+    invitation_not_found: "invitation_not_found",
+    invitations_disabled: "invitations_disabled",
 };
 
 export const responseSuccess = {
@@ -50,4 +54,9 @@ export const responseSuccess = {
     team_deleted: "team_deleted",
     team_players_found: "team_players_found",
     team_left: "team_left",
+    invitation_sent: "invitation_sent",
+    request_sent: "request_sent",
+    invitation_deleted: "invitation_deleted",
+    invitations_found: "invitations_found",
+    requests_found: "requests_found",
 };
