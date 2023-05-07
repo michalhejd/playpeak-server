@@ -90,7 +90,7 @@ router.put("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.team_updated, team);
 });
 
-// delete team
+// delete team - only capitan can delete team
 router.delete("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -104,7 +104,7 @@ router.delete("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.team_deleted);
 });
 
-// get team members
+// get team members - everyone can see
 router.get("/:id/members", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
@@ -117,7 +117,7 @@ router.get("/:id/members", async (req, res) => {
     handleSuccess(res, responseSuccess.team_players_found, formatUsers(members));
 });
 
-// remove member from team
+// remove member from team - only capitan can remove
 router.delete("/:id/members/:memberId", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
@@ -135,6 +135,7 @@ router.delete("/:id/members/:memberId", async (req, res) => {
     handleSuccess(res, responseSuccess.team_player_removed);
 });
 
+// leave team - everyone can leave
 router.delete("/:id/leave", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
@@ -150,6 +151,7 @@ router.delete("/:id/leave", async (req, res) => {
     handleSuccess(res, responseSuccess.team_left);
 });
 
+// invite player to team - only capitan can invite
 router.post("/:id/invite", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
@@ -179,6 +181,7 @@ router.post("/:id/invite", async (req, res) => {
     handleSuccess(res, responseSuccess.invitation_sent);
 });
 
+// request to join team - everyone can request
 router.post("/:id/request", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -200,6 +203,7 @@ router.post("/:id/request", async (req, res) => {
     handleSuccess(res, responseSuccess.request_sent);
 });
 
+// delete invitation - only sender and receiver can delete
 router.delete("/players/invitation/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -212,6 +216,7 @@ router.delete("/players/invitation/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.invitation_deleted);
 });
 
+// accept invitation - only receiver can accept
 router.patch("/players/invitation/:id/accept", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -228,6 +233,7 @@ router.patch("/players/invitation/:id/accept", async (req, res) => {
     if (usersTeam.capitan == user.id) throw new Error(responseErrors.already_in_team);
 });
 
+// decline invitation - only receiver can decline
 router.patch("/players/invitation/:id/decline", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -240,6 +246,7 @@ router.patch("/players/invitation/:id/decline", async (req, res) => {
     handleSuccess(res, responseSuccess.invitation_declined);
 });
 
+// get all invitations for user (inbox for invitations) - only receiver can get
 router.get("/@me/invitations", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -249,6 +256,7 @@ router.get("/@me/invitations", async (req, res) => {
     handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
 
+// get all requests from user to teams (inbox for requests) - only reciever can get
 router.get("/@me/requests", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
