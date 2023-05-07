@@ -9,7 +9,7 @@ import { VerifyTeam } from "../utils/verifyTeam.js";
 import { formatUsers } from "../../Users/utils/getFormatter.js";
 const router = express.Router()
 
-//get teams
+// get teams
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     handleSuccess(res, responseSuccess.teams_found, teams)
 })
 
-// get team im in
+// get team I'm in
 router.get("/@me", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
@@ -28,7 +28,7 @@ router.get("/@me", async (req, res) => {
     handleSuccess(res, responseSuccess.team_found, team)
 })
 
-//get team by id
+// get team by id
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
@@ -40,7 +40,7 @@ router.get("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.team_found, team)
 })
 
-//create team
+// create team
 router.post("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
@@ -62,10 +62,10 @@ router.post("/", async (req, res) => {
     handleSuccess(res, responseSuccess.team_created, team)
 })
 
-//update team
+// update team
 router.put("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-    //check if user exists and if user is verified
+    // check if user exists and if user is verified
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
@@ -73,7 +73,7 @@ router.put("/:id", async (req, res) => {
     if (!team) throw new Error(responseErrors.team_not_found)
     if (team.capitan != user._id) throw new Error(responseErrors.forbidden)
     const body = req.body
-    //cant change password while tournament is ongoing
+    // can't change password while tournament is ongoing
     if (body.name) {
         if (await Team.findOne({ name: body.name })) throw new Error(responseErrors.name_already_exists)
         if (!VerifyTeam.name(body.name)) throw new Error(responseErrors.bad_format)
@@ -87,7 +87,7 @@ router.put("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.team_updated, team)
 })
 
-//delete team
+// delete team
 router.delete("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user)
@@ -95,16 +95,16 @@ router.delete("/:id", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
     const team = await Team.findById(params.id)
     if (!team) throw new Error(responseErrors.team_not_found)
-    //can`t delete team if team is joined in tournament
+    // can`t delete team if team is joined in tournament
     if (team.capitan != user._id) throw new Error(responseErrors.forbidden)
     await Team.deleteOne({ _id: params.id })
     handleSuccess(res, responseSuccess.team_deleted)
 })
 
-//get team members
+// get team members
 router.get("/:id/members", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-    //check if user exists and if user is verified
+    // check if user exists and if user is verified
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
@@ -114,12 +114,12 @@ router.get("/:id/members", async (req, res) => {
     handleSuccess(res, responseSuccess.team_players_found, formatUsers(members))
 })
 
-//remove member from team
+// remove member from team
 router.delete("/:id/members/:memberId", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-    //check if user exists and if user is verified
+    // check if user exists and if user is verified
     const user = await checkUser(req.user)
-    //cant remove member if tournament is ongoing
+    // can't remove member if tournament is ongoing
     const params = req.params
     if (!VerifyTeam.id(params.id) || !VerifyTeam.id(params.memberId)) throw new Error(responseErrors.bad_format)
     const team = await Team.findById(params.id)
@@ -134,7 +134,7 @@ router.delete("/:id/members/:memberId", async (req, res) => {
 
 router.delete("/:id/leave", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-    //check if user exists and if user is verified
+    // check if user exists and if user is verified
     const user = await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
@@ -149,12 +149,12 @@ router.delete("/:id/leave", async (req, res) => {
 
 router.post("/:id/invite", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
-    //check if user exists and if user is verified
+    // check if user exists and if user is verified
     const user = await checkUser(req.user)
     const params = req.params
-    //check if params.id is in correct format
+    // heck if params.id is in correct format
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
-    //check if team exists
+    // check if team exists
     const team = await Team.findById(params.id)
     if (!team) throw new Error(responseErrors.team_not_found)
     if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full)

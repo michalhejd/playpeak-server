@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 export const invType = {
-    invitation: 'invitaion',
+    invitation: 'invitation',
     request: 'request'
 }
 
