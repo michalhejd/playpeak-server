@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
     handleSuccess(res, responseSuccess.teams_found, teams)
 })
 
+// get team im in
 router.get("/@me", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified

@@ -33,6 +33,7 @@ export const responseErrors = {
     invitation_not_found: "invitation_not_found",
     invitations_disabled: "invitations_disabled",
     team_full: "team_full",
+    update_password_or_nickname: "update_password_or_nickname",
 };
 
 export const responseSuccess = {

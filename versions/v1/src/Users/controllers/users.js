@@ -49,7 +49,6 @@ router.get("/", async (req, res) => {
 });
 
 
-
 router.get("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
@@ -63,7 +62,7 @@ router.get("/@self", async (req, res) => {
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
-    const user = await checkUser(req.user)
+    const user = await checkUser(req.user);
     if (user.role < roles.admin) throw new Error(responseErrors.forbidden);
     // get id from params
     const id = req.params.id;
@@ -230,27 +229,41 @@ router.post("/", emailLimiter, async (req, res) => {
 router.put("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
 
-    //func that verifies if user exists and if user is verified
-    const user = await checkUser(req.user)
+    // func that verifies if user exists and if user is verified
+    const user = await checkUser(req.user);
+
+    // keep track if user was updated
+    let userUpdated = false;
 
     const body = req.body;
 
-    //if body contains oldPassword and newPassword then it checks if oldPassword is correct and if newPassword is in correct format
+    // if body contains oldPassword and newPassword then it checks if oldPassword is correct and if newPassword is in correct format
     if (body.oldPassword && body.newPassword) {
         if (!await Password.verify(body.oldPassword, user.password)) throw new Error(responseErrors.bad_credentials);
         if (!Verify.password(body.newPassword)) throw new Error(responseErrors.bad_format);
-        //hashes new password
+        // hashes new password
         user.password = await Password.hash(body.newPassword);
+        userUpdated = true;
     }
 
-    //check if body contains nickname and if new nickname is not matching with old nickname
-    if (body.nickname && body.nickname !== user.nickname) {
-        if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
+
+    // check if body contains nickname, if it does, check if nickname is in correct format and if it is not already in use
+    if (body.nickname) {
+        // allow user to keep his nickname
+        if (!(body.nickname === user.nickname)) {
+            if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
+        }
         if (!Verify.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
         user.nickname = body.nickname;
+        userUpdated = true;
     }
 
-    //save user
+    // if user was not updated, throw error
+    if (!userUpdated) {
+        throw new Error(responseErrors.update_password_or_nickname);
+    }
+
+    // save user
     await user.save();
     handleSuccess(res, responseSuccess.user_updated);
 });
