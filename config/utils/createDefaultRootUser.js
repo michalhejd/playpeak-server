@@ -1,6 +1,6 @@
 import User from '../../versions/v1/src/Users/models/User.js';
 import { roles } from '../../versions/v1/src/Users/models/User.js';
-import { Password } from '../../versions/v1/src/Users/utils/Password.js';
+import { Password } from '../../versions/v1/src/Users/services/Password.js';
 
 export async function defaultRoot() {
     if (!process.env.ADMIN_EMAIL) {

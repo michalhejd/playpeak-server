@@ -7,13 +7,13 @@ import { responseErrors } from "../../Responses/utils/responseTemplate.js";
 import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
 import { checkUser } from "../services/checkUser.js";
-import { formatUsers, formatUser } from "../utils/getFormatter.js";
-import { Password } from "../utils/Password.js";
+import { Password } from "../services/Password.js";
 import { Verify } from "../utils/verifyUser.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
 import { emailLimiter } from "../../RateLimit/services/ratelimit.js";
+import { DateTime } from "luxon";
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ router.get("/", async (req, res) => {
         }
     }
     // create users const and then call func which will format users(it will return users without their password and __v)
-    const users = formatUsers(await User.find({}).lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage));
+    const users = await User.find({}).select("-password -__v -expiresAt").lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage)
     // return param which will tell user on which page he is
     const currentPage = page;
     handleSuccess(res, responseSuccess.users_found, { users, maxPages, currentPage });
@@ -53,9 +53,8 @@ router.get("/@self", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // pass to function which will check if user exists and if user is verified
     const user = await checkUser(req.user);
-    console.log(formatUser(user));
     // return user without his password and __v
-    handleSuccess(res, responseSuccess.user_found, formatUser(user));
+    handleSuccess(res, responseSuccess.user_found, user);
 });
 
 
@@ -69,10 +68,10 @@ router.get("/:id", async (req, res) => {
     // check if id is in correct format
     if (!Verify.id(id)) throw new Error(responseErrors.bad_format);
     // check if user exists
-    const userFound = await User.findById(id);
+    const userFound = await User.findById(id).select("-password -__v -expiresAt");
     if (!userFound) throw new Error(responseErrors.user_not_found);
     // return user without his password and __v
-    handleSuccess(res, responseSuccess.user_found, formatUser(userFound));
+    handleSuccess(res, responseSuccess.user_found, userFound);
 });
 
 
@@ -116,8 +115,10 @@ router.post("/register", emailLimiter, async (req, res) => {
         nickname: body.nickname,
         name: body.name,
         password: hashedPassword,
-        birthdate: body.birthdate
+        birthdate: body.birthdate,
+        createdAt: DateTime.local()
     });
+    console.log(user.createdAt)
 
     // generate verification code
     const code = generateVerificationCode();
@@ -137,6 +138,7 @@ router.post("/register", emailLimiter, async (req, res) => {
     sendEmail(user, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
 
     // sending response
+
     handleSuccess(res, responseSuccess.user_created);
 });
 

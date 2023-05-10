@@ -6,7 +6,6 @@ import { handleSuccess } from "../../Responses/utils/successHandler.js";
 import { checkUser } from "../../Users/services/checkUser.js";
 import User, { roles } from "../../Users/models/User.js";
 import { VerifyTeam } from "../utils/verifyTeam.js";
-import { formatUsers } from "../../Users/utils/getFormatter.js";
 const router = express.Router()
 
 // get teams
@@ -113,8 +112,8 @@ router.get("/:id/members", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
-    const members = await User.find({ _id: { $in: team.players } }).lean();
-    handleSuccess(res, responseSuccess.team_players_found, formatUsers(members));
+    const members = await User.find({ _id: { $in: team.players }}).lean().select('-password -__v -expiresAt');
+    handleSuccess(res, responseSuccess.team_players_found, members);
 });
 
 // remove member from team - only capitan can remove
