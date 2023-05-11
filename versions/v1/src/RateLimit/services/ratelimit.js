@@ -4,7 +4,7 @@ export const globalLimiter = rateLimit({
     // "block" user for 15 minutes
     windowMs: 15 * 60 * 1000,
     // limit of 750 requests per minute
-    max: 750, 
+    max: 2000, 
     message: {message: 'Too many requests from this IP, please try again later', date: Date.now(), status: 429}
 });
 
