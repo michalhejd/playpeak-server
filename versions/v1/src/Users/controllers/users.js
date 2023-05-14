@@ -115,10 +115,8 @@ router.post("/register", emailLimiter, async (req, res) => {
         nickname: body.nickname,
         name: body.name,
         password: hashedPassword,
-        birthdate: body.birthdate,
-        createdAt: DateTime.local()
+        birthdate: body.birthdate
     });
-    console.log(user.createdAt)
 
     // generate verification code
     const code = generateVerificationCode();

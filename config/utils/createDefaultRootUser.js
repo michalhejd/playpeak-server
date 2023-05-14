@@ -17,8 +17,8 @@ export async function defaultRoot() {
         const user = new User({
             email: email,
             password: hashedPassword,
-            nickname: "admin",
-            name: "admin",
+            nickname: "root",
+            name: "Root Root",
             birthdate: new Date(),
             // setting to highest role -> root, this role can only be reached by this User
             role: roles.root,
@@ -26,7 +26,7 @@ export async function defaultRoot() {
             expiresAt: null
         })
         await user.save()
-        console.log("Default organizer created with \nEmail: " + process.env.ADMIN_EMAIL + "\nPassword: " + password)
+        console.log("Default root user created with \nEmail: " + process.env.ADMIN_EMAIL + "\nPassword: " + password)
     } catch (err) {
         console.log(err)
         process.exit(0)

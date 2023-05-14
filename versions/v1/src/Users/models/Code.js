@@ -17,7 +17,7 @@ const verificationCodeSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 60 * 10
+        expires: '10m'
     }
 });
 
