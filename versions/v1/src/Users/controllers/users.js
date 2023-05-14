@@ -41,8 +41,20 @@ router.get("/", async (req, res) => {
             query.sort = { _id: 1 };
         }
     }
+    if(typeof query.whispering == "string") {
+        query.whispering = query.whispering.trim();
+    }
+    else {
+        query.whispering = "";
+    }
     // create users const and then call func which will format users(it will return users without their password and __v)
-    const users = await User.find({}).select("-password -__v -expiresAt").lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage)
+    const users = await User.find({
+        $or: [
+            { name: { $regex: query.whispering, $options: 'i' } }, // Search in Name field
+            { nickname: { $regex: query.whispering, $options: 'i' } }, // Search in Nickname field
+            { email: { $regex: query.whispering, $options: 'i' } } // Search in Email field
+          ]
+    }).select("-password -__v -expiresAt").lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage)
     // return param which will tell user on which page he is
     const currentPage = page;
     handleSuccess(res, responseSuccess.users_found, { users, maxPages, currentPage });
