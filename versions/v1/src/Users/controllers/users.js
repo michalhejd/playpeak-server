@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
     //get of query params
     const query = req.query;
     //maximum users per page
-    const maxUsersPerPage = 2;
+    const maxUsersPerPage = 20;
     // calc of max pages (from total User documents in db)
     const maxPages = Math.ceil(await User.countDocuments() / maxUsersPerPage);
     // check if page can be returned (if page number is not greater than maxPages and if page is not less than 1) otherwise return first page
