@@ -45,7 +45,7 @@ export async function checkEnvironments(){
     }
     if(missingEnvironments.length > 0){
         console.log("Missing environments: " + missingEnvironments.join(", "));
-        return process.exit(0);
+        return process.exit(1);
     }
     return;
 }
