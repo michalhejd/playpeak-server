@@ -51,6 +51,6 @@ const userSchema = new mongoose.Schema({
         default: Date.now,
         expires: '24h'
     }
-});
+}, {timestamps: true});
 
 export default mongoose.model('User', userSchema, 'users');
