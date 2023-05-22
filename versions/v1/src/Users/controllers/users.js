@@ -13,7 +13,6 @@ import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
 import { emailLimiter } from "../../RateLimit/services/ratelimit.js";
-import { DateTime } from "luxon";
 
 const router = express.Router();
 
@@ -42,11 +41,13 @@ router.get("/", async (req, res) => {
         }
     }
     if(typeof query.whispering == "string") {
+        // trimming input from frontend
         query.whispering = query.whispering.trim();
     }
     else {
         query.whispering = "";
     }
+
     // create users const and then call func which will format users(it will return users without their password and __v)
     const users = await User.find({
         $or: [
@@ -248,16 +249,17 @@ router.put("/@self", async (req, res) => {
     let userUpdated = false;
 
     const body = req.body;
+    // get user password from database
+    const findUserPass = await User.findById(user.id);
 
     // if body contains oldPassword and newPassword then it checks if oldPassword is correct and if newPassword is in correct format
     if (body.oldPassword && body.newPassword) {
-        if (!await Password.verify(body.oldPassword, user.password)) throw new Error(responseErrors.bad_credentials);
+        if (!await Password.verify(body.oldPassword, findUserPass.password)) throw new Error(responseErrors.bad_credentials);
         if (!Verify.password(body.newPassword)) throw new Error(responseErrors.bad_format);
         // hashes new password
         user.password = await Password.hash(body.newPassword);
         userUpdated = true;
     }
-
 
     // check if body contains nickname, if it does, check if nickname is in correct format and if it is not already in use
     if (body.nickname) {
@@ -343,6 +345,7 @@ router.put("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.user_updated);
 });
 
+// this endpoint will be used to verify user using link from email
 router.patch("/verify", emailLimiter, async (req, res) => {
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
