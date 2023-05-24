@@ -8,7 +8,7 @@ import { verifyRegisterBody } from "../utils/verifyRegisterParams.js";
 import { signToken } from "../../Token/utils/signToken.js";
 import { checkUser } from "../services/checkUser.js";
 import { Password } from "../services/Password.js";
-import { Verify } from "../utils/verifyUser.js";
+import { VerifyUser } from "../utils/verifyUser.js";
 import { generateVerificationCode } from "../services/generateToken.js";
 import Code from "../models/Code.js";
 import { sendEmail } from "../../Email/services/sendEmailWithCode.js";
@@ -79,7 +79,7 @@ router.get("/:id", async (req, res) => {
     // get id from params
     const id = req.params.id;
     // check if id is in correct format
-    if (!Verify.id(id)) throw new Error(responseErrors.bad_format);
+    if (!VerifyUser.id(id)) throw new Error(responseErrors.bad_format);
     // check if user exists
     const userFound = await User.findById(id).select("-password -__v -expiresAt");
     if (!userFound) throw new Error(responseErrors.user_not_found);
@@ -192,13 +192,13 @@ router.post("/", emailLimiter, async (req, res) => {
 
     // if body contains role param, check if user is superAdmin and verify if role is in correct format
     if (body.role) {
-        if (!Verify.role(body.role)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.role(body.role)) throw new Error(responseErrors.bad_format);
         if (body.role >= user.role) throw new Error(responseErrors.forbidden);
     }
     // if body contains verified param, check if user is superAdmin and verify if verified is in correct format
     if (body.verified) {
         if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
-        if (!Verify.verified(body.verified)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.verified(body.verified)) throw new Error(responseErrors.bad_format);
     }
 
     // verify if email and nickname are not already in use
@@ -267,7 +267,7 @@ router.put("/@self", async (req, res) => {
         if (!(body.nickname === user.nickname)) {
             if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
         }
-        if (!Verify.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
         user.nickname = body.nickname;
         userUpdated = true;
     }
@@ -302,7 +302,7 @@ router.put("/:id", async (req, res) => {
 
     //check if body contains role and if role is in correct format
     if (body.role) {
-        if (!Verify.role(body.role)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.role(body.role)) throw new Error(responseErrors.bad_format);
         if (body.role >= user.role) throw new Error(responseErrors.forbidden);
 
         updatedUser.role = body.role;
@@ -311,32 +311,32 @@ router.put("/:id", async (req, res) => {
     //check if body contains verified and if verified is in correct format
     if (body.verified) {
         if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
-        if (!Verify.verified(body.verified)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.verified(body.verified)) throw new Error(responseErrors.bad_format);
     }
 
     //check if body contains name and if name is in correct format
     if (body.name) {
-        if (!Verify.name(body.name)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.name(body.name)) throw new Error(responseErrors.bad_format);
         updatedUser.name = body.name;
     }
 
     //check if body contains nickname, if nickname doesnt exist and if nickname is in correct format
     if (body.nickname) {
         if (await User.findOne({ nickname: body.nickname })) throw new Error(responseErrors.nickname_already_exists);
-        if (!Verify.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.nickname(body.nickname)) throw new Error(responseErrors.bad_format);
         updatedUser.nickname = body.nickname;
     }
 
     //check if body contains email, if email doesnt exist and if email is in correct format
     if (body.email) {
         if (await User.findOne({ email: body.email })) throw new Error(responseErrors.email_already_exists);
-        if (!Verify.email(body.email)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.email(body.email)) throw new Error(responseErrors.bad_format);
         updatedUser.email = body.email;
     }
 
     //check if body contains birthdate and if birthdate is in correct format
     if (body.birthdate) {
-        if (!Verify.birthdate(body.birthdate)) throw new Error(responseErrors.bad_format);
+        if (!VerifyUser.birthdate(body.birthdate)) throw new Error(responseErrors.bad_format);
         updatedUser.birthdate = body.birthdate;
     }
 
@@ -381,7 +381,7 @@ router.patch("/verify/:id", emailLimiter, async (req, res) => {
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const params = req.params;
     if(typeof params.id !== "string") throw new Error(responseErrors.bad_format);
-    if(!Verify.id(params.id)) throw new Error(responseErrors.bad_format);
+    if(!VerifyUser.id(params.id)) throw new Error(responseErrors.bad_format);
     const code = await Code.findOne({ _id: params.id });
     if (!code) throw new Error(responseErrors.code_not_found);
 

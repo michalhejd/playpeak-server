@@ -28,6 +28,22 @@ router.get("/@me", async (req, res) => {
     handleSuccess(res, responseSuccess.team_found, team)
 });
 
+// get all requests from user to teams (inbox for requests) - only reciever can get
+router.get("/@me/requests", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await checkUser(req.user);
+    const requests = await Invitation.find({toUser: user._id, type: invType.request});
+    handleSuccess(res, responseSuccess.requests_found, requests);
+});
+
+// get all invitations for user (inbox for invitations) - only receiver can get
+router.get("/@me/invitations", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await checkUser(req.user);
+    const invitations = await Invitation.find({toUser: user._id, type: invType.invitation});
+    handleSuccess(res, responseSuccess.invitations_found, invitations);
+});
+
 // get team by id
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -40,15 +56,6 @@ router.get("/:id", async (req, res) => {
     handleSuccess(res, responseSuccess.team_found, team)
 });
 
-// get all requests from user to teams (inbox for requests) - only reciever can get
-router.get("/@me/requests", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    const user = await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
-    const requests = await Invitation.find({toUser: user._id, type: invType.request});
-    handleSuccess(res, responseSuccess.requests_found, requests);
-});
 
 // get team members - everyone can see
 router.get("/:id/members", async (req, res) => {
@@ -61,16 +68,6 @@ router.get("/:id/members", async (req, res) => {
     if (!team) throw new Error(responseErrors.team_not_found);
     const members = await User.find({ _id: { $in: team.players }}).lean().select('-password -__v -expiresAt');
     handleSuccess(res, responseSuccess.team_players_found, members);
-});
-
-// get all invitations for user (inbox for invitations) - only receiver can get
-router.get("/@me/invitations", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    const user = await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
-    const invitations = await Invitation.find({toUser: user._id, type: invType.invitation});
-    handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
 
 // create team

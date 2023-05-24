@@ -1,7 +1,7 @@
 import { roles } from "../models/User.js";
 import mongoose from 'mongoose';
 import { regexList, verifyRomanCzech } from "./regexParams.js";
-export class Verify {
+export class VerifyUser {
     //https://jsdoc.app/about-getting-started.html
     /**
      * 

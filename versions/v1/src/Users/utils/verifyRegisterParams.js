@@ -1,15 +1,15 @@
-import { Verify } from "./verifyUser.js"
+import { VerifyUser } from "./verifyUser.js"
 
 export function verifyRegisterBody(email, nickname, name, password, birthdate) {
     // verify email
-    if (!Verify.email(email)) { return false; }
+    if (!VerifyUser.email(email)) { return false; }
     // verify nickname
-    if (!Verify.nickname(nickname)) { return false; }
+    if (!VerifyUser.nickname(nickname)) { return false; }
     // verify name
-    if (!Verify.name(name)) { return false; }
+    if (!VerifyUser.name(name)) { return false; }
     // verify password
-    if (!Verify.password(password)) { return false; }
+    if (!VerifyUser.password(password)) { return false; }
     // verify birthdate
-    if (!Verify.birthdate(birthdate)) { return false; }
+    if (!VerifyUser.birthdate(birthdate)) { return false; }
     return true;
 }
