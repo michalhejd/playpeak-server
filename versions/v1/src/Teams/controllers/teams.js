@@ -136,7 +136,7 @@ router.post("/:id/request", async (req, res) => {
     if (!team) throw new Error(responseErrors.team_not_found);
     if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team);
     if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    if((await Invitation.find({toUser: user._id, team: params.id})).length > 0) throw new Error(responseErrors.already_requested);
+    if((await Invitation.find({fromUser: user.id, team: params.id})).length > 0) throw new Error(responseErrors.already_requested);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: team.capitan,
