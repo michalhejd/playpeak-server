@@ -40,7 +40,7 @@ router.get("/@me/requests", async (req, res) => {
 router.get("/@me/invitations", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const invitations = await Invitation.find({toUser: user._id, type: invType.invitation});
+    const invitations = await Invitation.find({toUser: user.id, type: invType.invitation});
     handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
 
