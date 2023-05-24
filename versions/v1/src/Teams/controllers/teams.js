@@ -32,7 +32,7 @@ router.get("/@me", async (req, res) => {
 router.get("/@me/requests", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const requests = await Invitation.find({toUser: user._id, type: invType.request});
+    const requests = await Invitation.find({fromUser: user.id, type: invType.request});
     handleSuccess(res, responseSuccess.requests_found, requests);
 });
 
