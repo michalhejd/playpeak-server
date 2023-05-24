@@ -32,7 +32,7 @@ router.get("/@me", async (req, res) => {
 router.get("/@me/requests", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const requests = await Invitation.find({toUser: user._id, type: invType.request});
+    const requests = await Invitation.find({fromUser: user.id, type: invType.request});
     handleSuccess(res, responseSuccess.requests_found, requests);
 });
 
@@ -40,7 +40,7 @@ router.get("/@me/requests", async (req, res) => {
 router.get("/@me/invitations", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const invitations = await Invitation.find({toUser: user._id, type: invType.invitation});
+    const invitations = await Invitation.find({toUser: user.id, type: invType.invitation});
     handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
 
@@ -93,31 +93,6 @@ router.post("/", async (req, res) => {
     });
     await team.save();
     handleSuccess(res, responseSuccess.team_created, team);
-});
-
-// update team
-router.put("/:id", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    // check if user exists and if user is verified
-    const user = await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
-    const team = await Team.findById(params.id);
-    if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
-    const body = req.body;
-    // can't change password while tournament is ongoing
-    if (body.name) {
-        if (await Team.findOne({ name: body.name })) throw new Error(responseErrors.name_already_exists);
-        if (!VerifyTeam.name(body.name)) throw new Error(responseErrors.bad_format);
-        team.name = body.name;
-    }
-    if (body.invitations) {
-        if (!VerifyTeam.invitations(body.invitations)) throw new Error(responseErrors.bad_format);
-        team.invitations = body.invitations;
-    }
-    await team.save();
-    handleSuccess(res, responseSuccess.team_updated, team);
 });
 
 // invite player to team - only capitan can invite
@@ -173,6 +148,31 @@ router.post("/:id/request", async (req, res) => {
     handleSuccess(res, responseSuccess.request_sent);
 });
 
+// update team
+router.put("/:id", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    // check if user exists and if user is verified
+    const user = await checkUser(req.user);
+    const params = req.params;
+    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
+    const team = await Team.findById(params.id);
+    if (!team) throw new Error(responseErrors.team_not_found);
+    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
+    const body = req.body;
+    // can't change password while tournament is ongoing
+    if (body.name) {
+        if (await Team.findOne({ name: body.name })) throw new Error(responseErrors.name_already_exists);
+        if (!VerifyTeam.name(body.name)) throw new Error(responseErrors.bad_format);
+        team.name = body.name;
+    }
+    if (body.invitations) {
+        if (!VerifyTeam.invitations(body.invitations)) throw new Error(responseErrors.bad_format);
+        team.invitations = body.invitations;
+    }
+    await team.save();
+    handleSuccess(res, responseSuccess.team_updated, team);
+});
+
 // delete team - only capitan can delete team
 router.delete("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -186,7 +186,6 @@ router.delete("/:id", async (req, res) => {
     await Team.deleteOne({ _id: params.id });
     handleSuccess(res, responseSuccess.team_deleted);
 });
-
 
 
 // remove member from team - only capitan can remove
