@@ -139,7 +139,7 @@ router.post("/:id/invite", async (req, res) => {
     const userToInvite = await User.findById(body.userId);
     if (!userToInvite) throw new Error(responseErrors.user_not_found);
     if (team.players.includes(body.userId)) throw new Error(responseErrors.already_in_team);
-    if(await Invitation.find({toUser: body.userId, team: params.id})) throw new Error(responseErrors.already_invited);
+    if(await Invitation.findOne({toUser: body.userId, team: params.id, type: invType.invitation})) throw new Error(responseErrors.already_invited);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: body.userId,
@@ -154,14 +154,15 @@ router.post("/:id/invite", async (req, res) => {
 router.post("/:id/request", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    if(await Team.find({ players: user._id })) throw new Error(responseErrors.already_in_team);
+    console.log(user)
+    if(await Team.findOne({ players: user._id })) throw new Error(responseErrors.already_in_team);
     const params = req.params;
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
     if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team);
     if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    if(await Invitation.find({toUser: user._id, team: params.id})) throw new Error(responseErrors.already_requested);
+    if(await Invitation.findOne({toUser: user._id, team: params.id, type: invType.request})) throw new Error(responseErrors.already_requested);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: team.capitan,
@@ -238,6 +239,7 @@ router.delete("/players/invitation/:id", async (req, res) => {
 });
 
 // accept invitation - only receiver can accept
+//TODO
 router.patch("/players/invitation/:id/accept", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
