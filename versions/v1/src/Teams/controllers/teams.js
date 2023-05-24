@@ -95,31 +95,6 @@ router.post("/", async (req, res) => {
     handleSuccess(res, responseSuccess.team_created, team);
 });
 
-// update team
-router.put("/:id", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    // check if user exists and if user is verified
-    const user = await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
-    const team = await Team.findById(params.id);
-    if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
-    const body = req.body;
-    // can't change password while tournament is ongoing
-    if (body.name) {
-        if (await Team.findOne({ name: body.name })) throw new Error(responseErrors.name_already_exists);
-        if (!VerifyTeam.name(body.name)) throw new Error(responseErrors.bad_format);
-        team.name = body.name;
-    }
-    if (body.invitations) {
-        if (!VerifyTeam.invitations(body.invitations)) throw new Error(responseErrors.bad_format);
-        team.invitations = body.invitations;
-    }
-    await team.save();
-    handleSuccess(res, responseSuccess.team_updated, team);
-});
-
 // invite player to team - only capitan can invite
 router.post("/:id/invite", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -154,14 +129,14 @@ router.post("/:id/invite", async (req, res) => {
 router.post("/:id/request", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    if(await Team.find({ players: user._id })) throw new Error(responseErrors.already_in_team);
+    if((await Team.find({ players: user._id })).length > 0) throw new Error(responseErrors.already_in_team);
     const params = req.params;
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
     if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team);
     if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    if(await Invitation.find({toUser: user._id, team: params.id})) throw new Error(responseErrors.already_requested);
+    if((await Invitation.find({toUser: user._id, team: params.id})).length > 0) throw new Error(responseErrors.already_requested);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: team.capitan,
@@ -170,6 +145,31 @@ router.post("/:id/request", async (req, res) => {
     });
     await invitation.save();
     handleSuccess(res, responseSuccess.request_sent);
+});
+
+// update team
+router.put("/:id", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    // check if user exists and if user is verified
+    const user = await checkUser(req.user);
+    const params = req.params;
+    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
+    const team = await Team.findById(params.id);
+    if (!team) throw new Error(responseErrors.team_not_found);
+    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
+    const body = req.body;
+    // can't change password while tournament is ongoing
+    if (body.name) {
+        if (await Team.findOne({ name: body.name })) throw new Error(responseErrors.name_already_exists);
+        if (!VerifyTeam.name(body.name)) throw new Error(responseErrors.bad_format);
+        team.name = body.name;
+    }
+    if (body.invitations) {
+        if (!VerifyTeam.invitations(body.invitations)) throw new Error(responseErrors.bad_format);
+        team.invitations = body.invitations;
+    }
+    await team.save();
+    handleSuccess(res, responseSuccess.team_updated, team);
 });
 
 // delete team - only capitan can delete team
@@ -185,7 +185,6 @@ router.delete("/:id", async (req, res) => {
     await Team.deleteOne({ _id: params.id });
     handleSuccess(res, responseSuccess.team_deleted);
 });
-
 
 
 // remove member from team - only capitan can remove
