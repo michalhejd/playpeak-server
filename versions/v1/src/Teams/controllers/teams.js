@@ -222,19 +222,19 @@ router.delete("/:id", async (req, res) => {
 
 
 // remove member from team - only capitan can remove
-router.delete("/:id/members/:memberId", async (req, res) => {
+router.delete("/members/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
     const user = await checkUser(req.user);
+    const team = await Team.findOne({players: user.id});
+    if(!team) throw new Error(responseErrors.team_not_found);
+    if(team.capitan != user.id) throw new Error(responseErrors.forbidden);
     // can't remove member if tournament is ongoing
     const params = req.params;
-    if (!VerifyTeam.id(params.id) || !VerifyTeam.id(params.memberId)) throw new Error(responseErrors.bad_format);
-    const team = await Team.findById(params.id);
-    if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
-    if (params.memberId == capitan) throw new Error(responseErrors.cant_remove_yourself);
-    if (!team.players.includes(params.memberId)) throw new Error(responseErrors.player_not_found);
-    team.players = team.players.filter(player => player != params.memberId);
+    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
+    if (params.id == team.capitan) throw new Error(responseErrors.cant_remove_yourself);
+    if (!team.players.includes(params.id)) throw new Error(responseErrors.player_not_found);
+    team.players = team.players.filter(player => player != params.id);
     await team.save();
     handleSuccess(res, responseSuccess.team_player_removed);
 });
