@@ -29,6 +29,6 @@ const invitationSchema = new Schema({
         required: true,
         enum: Object.values(invType)
     },
-});
+}, { timestamps: true });
 
 export default mongoose.model('Invitation', invitationSchema, 'invitations');

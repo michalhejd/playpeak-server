@@ -33,6 +33,6 @@ const teamSchema = new Schema({
         required: true,
         default: true
     }
-});
+}, { timestamps: true });
 
 export default mongoose.model('Team', teamSchema, 'teams');

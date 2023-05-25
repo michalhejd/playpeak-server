@@ -32,7 +32,7 @@ router.get("/@me", async (req, res) => {
 router.get("/@me/requests", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const requests = await Invitation.find({fromUser: user.id, type: invType.request});
+    const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
     handleSuccess(res, responseSuccess.requests_found, requests);
 });
 
@@ -40,7 +40,7 @@ router.get("/@me/requests", async (req, res) => {
 router.get("/@me/invitations", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const invitations = await Invitation.find({toUser: user.id, type: invType.invitation});
+    const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation });
     handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
 
@@ -66,7 +66,7 @@ router.get("/:id/members", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
-    const members = await User.find({ _id: { $in: team.players }}).lean().select('-password -__v -expiresAt');
+    const members = await User.find({ _id: { $in: team.players } }).lean().select('-password -__v -expiresAt');
     handleSuccess(res, responseSuccess.team_players_found, members);
 });
 
@@ -106,15 +106,15 @@ router.post("/:id/invite", async (req, res) => {
     // check if team exists
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
-    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    if(team.invitations !== true && team.capitan !== user.id) throw new Error(responseErrors.invitations_disabled);
+    if (team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
+    if (team.invitations !== true && team.capitan !== user.id) throw new Error(responseErrors.invitations_disabled);
     const body = req.body;
     // id of user to invite
     if (!VerifyTeam.id(body.userId)) throw new Error(responseErrors.bad_format);
     const userToInvite = await User.findById(body.userId);
     if (!userToInvite) throw new Error(responseErrors.user_not_found);
     if (team.players.includes(body.userId)) throw new Error(responseErrors.already_in_team);
-    if(await Invitation.findOne({toUser: body.userId, team: params.id, type: invType.invitation})) throw new Error(responseErrors.already_invited);
+    if (await Invitation.findOne({ toUser: body.userId, team: params.id, type: invType.invitation })) throw new Error(responseErrors.already_invited);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: body.userId,
@@ -129,15 +129,14 @@ router.post("/:id/invite", async (req, res) => {
 router.post("/:id/request", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    console.log(user)
-    if(await Team.findOne({ players: user._id })) throw new Error(responseErrors.already_in_team);
+    if (await Team.findOne({ players: user._id })) throw new Error(responseErrors.already_in_team);
     const params = req.params;
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
     if (team.players.includes(user._id)) throw new Error(responseErrors.already_in_team);
-    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    if(await Invitation.findOne({toUser: user._id, team: params.id, type: invType.request})) throw new Error(responseErrors.already_requested);
+    if (team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
+    if (await Invitation.findOne({ fromUser: user._id, team: params.id, type: invType.request })) throw new Error(responseErrors.already_requested);
     const invitation = new Invitation({
         fromUser: user._id,
         toUser: team.capitan,
@@ -246,13 +245,44 @@ router.patch("/players/invitation/:id/accept", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const invitation = await Invitation.findById(params.id);
     if (!invitation) throw new Error(responseErrors.invitation_not_found);
-    if (invitation.toUser != user.id) throw new Error(responseErrors.forbidden);
     const team = await Team.findById(invitation.team);
-    if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.players.includes(user.id)) throw new Error(responseErrors.already_in_team);
-    if(team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
-    const usersTeam = await Team.find({ players: user._id });
-    if (usersTeam.capitan == user.id) throw new Error(responseErrors.already_in_team);
+    if (!team) {
+        await Invitation.findByIdAndDelete(invitation.id)
+        throw new Error(responseErrors.team_not_found);
+    }
+    if (invitation.type == invType.invitation) {
+        if (invitation.toUser != user.id) throw new Error(responseErrors.forbidden);
+        if (team.players.includes(user.id)) {
+            await Invitation.findByIdAndDelete(invitation.id)
+            throw new Error(responseErrors.already_in_team);
+        }
+        if (team.players.length >= team.maxPlayers) {
+            throw new Error(responseErrors.team_full);
+        }
+        team.players.push(user.id);
+        await Invitation.findByIdAndDelete(invitation.id)
+        await team.save();
+        handleSuccess(res, responseSuccess.invitation_accepted);
+    }
+    else if (invitation.type == invType.request) {
+        if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
+        if (team.players.includes(invitation.fromUser)) {
+            await Invitation.findByIdAndDelete(invitation.id)
+            throw new Error(responseErrors.already_in_team);
+        }
+        if (team.players.length >= team.maxPlayers) {
+            throw new Error(responseErrors.team_full);
+        }
+
+        team.players.push(invitation.fromUser);
+        await Invitation.findByIdAndDelete(invitation.id)
+        await team.save();
+        handleSuccess(res, responseSuccess.invitation_accepted);
+    }
+    else {
+        Invitation.findByIdAndDelete(invitation.id)
+        throw new Error(responseErrors.server_error);
+    }
 });
 
 // decline invitation - only receiver can decline

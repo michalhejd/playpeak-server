@@ -27,6 +27,6 @@ const gameSchema = new Schema({
         maxLength: 32,
         unique: true
     }
-});
+}, { timestamps: true });
 
 export default mongoose.model('Game', gameSchema, 'games');
