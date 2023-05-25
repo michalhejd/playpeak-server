@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
+export const gamemodes = {
+    normal: 'normal',
+}
+
 const tournamentSchema = new Schema({
     name: {
         type: String,
@@ -22,11 +26,6 @@ const tournamentSchema = new Schema({
     },
     startDate: {
         type: Date,
-        startNow: true,
-        required: true
-    },
-    endDate: {
-        type: Date,
         required: true
     },
     // before the startDate, the tournament is in registration phase
@@ -47,19 +46,30 @@ const tournamentSchema = new Schema({
     },
     maxTeams: {
         type: Number,
-        required: true
+        required: true,
+        max: 16,
     },
     gameMode: {
         type: String,
         required: true,
-        default: "normal"
+        enum: Object.values(gamemodes)
     },
     // contains all matches that were played in this tournament
     matches: {
         type: [Schema.Types.ObjectId],
         ref: 'Match',
         required: false
+    },
+    selection: {
+        type: Schema.Types.ObjectId || null,
+        ref: "Grouping",
+        required: true
+    },
+    brackets: {
+        type: [Schema.Types.ObjectId] || null,
+        ref: "Phase",
+        required: true
     }
-});
+}, { timestamps: true });
 
 export default mongoose.model('Tournament', tournamentSchema, 'tournaments');

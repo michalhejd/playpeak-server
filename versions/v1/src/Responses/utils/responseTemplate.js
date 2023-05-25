@@ -34,6 +34,9 @@ export const responseErrors = {
     invitations_disabled: "invitations_disabled",
     team_full: "team_full",
     update_password_or_nickname: "update_password_or_nickname",
+    already_exists: "already_exists",
+    cant_have_more_than_one_tournament: "cant_have_more_than_one_tournament",
+    tournament_not_found: "tournament_not_found",
 };
 
 export const responseSuccess = {
@@ -63,4 +66,9 @@ export const responseSuccess = {
     requests_found: "requests_found",
     invitation_declined: "invitation_declined",
     invitation_accepted: "invitation_accepted",
+    tournament_created: "tournament_created",
+    tournaments_found: "tournaments_found",
+    tournament_found: "tournament_found",
+    tournament_updated: "tournament_updated",
+    tournament_deleted: "tournament_deleted",
 };

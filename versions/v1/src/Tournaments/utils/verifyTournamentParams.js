@@ -8,6 +8,8 @@ export function verifyTournamentBody(name, organizer, game, startDate, startRegi
     if(!VerifyTournament.date(startDate)) return false
     if(!VerifyTournament.date(startRegistration)) return false
     if(!VerifyTournament.date(endRegistration)) return false
+    if(startRegistration >= endRegistration) return false
+    if(startDate <= endRegistration) return false
     if(!VerifyTournament.maxTeams(maxTeams)) return false
     if(!VerifyTournament.gameMode(gameMode)) return false
 }

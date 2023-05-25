@@ -74,6 +74,18 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.invitation_accepted:
             res.status(200).json({ meta: { message: "Invitation accepted", date: Date.now(), status: 200 } });
             return;
+        case responseSuccess.tournaments_found:
+            res.status(200).json({ meta: { message: "Tournaments found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.tournament_found:
+            res.status(200).json({ meta: { message: "Tournament found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.tournament_updated:
+            res.status(200).json({ meta: { message: "Tournament updated", date: Date.now(), status: 200 } });
+            return;
+        case responseSuccess.tournament_deleted:
+            res.status(200).json({ meta: { message: "Tournament deleted", date: Date.now(), status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
             return;
@@ -82,6 +94,9 @@ export function handleSuccess(res, response, data) {
             return;
         case responseSuccess.team_created:
             res.status(201).json({ meta: { message: "Team successfully created", date: Date.now(), status: 201 }, data: data });
+            return;
+        case responseSuccess.tournament_created:
+            res.status(201).json({ meta: { message: "Tournament successfully created", date: Date.now(), status: 201 }, data: data });
             return;
         default:
             res.status(500).json({ meta: { message: "Internal server error", date: Date.now(), status: 500 } });

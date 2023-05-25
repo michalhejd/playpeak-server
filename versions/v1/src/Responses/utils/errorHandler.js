@@ -23,6 +23,8 @@ export function handleErr(err, req, res, next) {
             return res.status(403).json({ meta: { message: "You need to change your password", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.invitations_disabled:
             return res.status(403).json({ meta: { message: "Invitations are disabled", date: Date.now(), status: 403, error: err.message } });
+        case responseErrors.cant_have_more_than_one_tournament: 
+            return res.status(403).json({ meta: { message: "You can't have more than one tournament", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.user_not_found:
             return res.status(404).json({ meta: { message: "User not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.code_not_found:
