@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { gamemodes } from "../models/Tournament";
+import { gamemodes } from "../models/Tournament.js";
 export class VerifyTournament{
     static id(id){
         if(!mongoose.Types.ObjectId.isValid(id)) return false;

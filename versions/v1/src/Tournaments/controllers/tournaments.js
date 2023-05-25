@@ -117,3 +117,5 @@ router.delete("/:id", async (req, res) => {
     await Tournament.findByIdAndDelete(params.id);
     handleSuccess(res, responseSuccess.tournament_deleted);
 })
+
+export default router;

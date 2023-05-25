@@ -37,7 +37,8 @@ export const responseErrors = {
     already_exists: "already_exists",
     cant_have_more_than_one_tournament: "cant_have_more_than_one_tournament",
     tournament_not_found: "tournament_not_found",
-    not_in_team: "not_in_team"
+    not_in_team: "not_in_team",
+    already_joined: "already_joined",
 };
 
 export const responseSuccess = {
@@ -72,4 +73,5 @@ export const responseSuccess = {
     tournament_found: "tournament_found",
     tournament_updated: "tournament_updated",
     tournament_deleted: "tournament_deleted",
+    tournament_joined: "tournament_joined",
 };

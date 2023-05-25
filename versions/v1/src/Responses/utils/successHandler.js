@@ -86,6 +86,9 @@ export function handleSuccess(res, response, data) {
         case responseSuccess.tournament_deleted:
             res.status(200).json({ meta: { message: "Tournament deleted", date: Date.now(), status: 200 } });
             return;
+        case responseSuccess.tournament_joined:
+            res.status(200).json({ meta: { message: "Tournament joined", date: Date.now(), status: 200 } });
+            return;
         case responseSuccess.user_created:
             res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
             return;

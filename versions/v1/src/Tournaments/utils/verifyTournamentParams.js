@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { VerifyTournament } from "./verifyTournament";
+import { VerifyTournament } from "./verifyTournament.js";
 
 export function verifyTournamentBody(name, organizer, game, startDate, startRegistration, endRegistration, maxTeams, gameMode) {
     if(!VerifyTournament.name(name)) return false
