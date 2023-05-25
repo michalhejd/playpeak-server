@@ -111,10 +111,6 @@ router.post("/", async (req, res) => {
     handleSuccess(res, responseSuccess.team_created, team);
 });
 
-// :id/invite
-// 
-// 
-
 
 // invite player to team - only capitan can invite
 router.post("/invite/:id", async (req, res) => {
@@ -209,7 +205,7 @@ router.delete("/leave", async (req, res) => {
     handleSuccess(res, responseSuccess.team_left);
 });
 
-// delete invitation - only sender and receiver can delete
+// delete invitation - only sender can delete
 router.delete("/players/invitation/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -217,7 +213,7 @@ router.delete("/players/invitation/:id", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const invitation = await Invitation.findById(params.id);
     if (!invitation) throw new Error(responseErrors.invitation_not_found);
-    if (invitation.toUser != user.id || invitation.fromUser != user.id) throw new Error(responseErrors.forbidden);
+    if (invitation.fromUser != user.id) throw new Error(responseErrors.forbidden);
     await Invitation.findByIdAndDelete(params.id);
     handleSuccess(res, responseSuccess.invitation_deleted);
 });
