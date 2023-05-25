@@ -95,30 +95,35 @@ router.post("/", async (req, res) => {
     handleSuccess(res, responseSuccess.team_created, team);
 });
 
+// :id/invite
+// 
+// 
+
+
 // invite player to team - only capitan can invite
-router.post("/:id/invite", async (req, res) => {
+router.post("/invite/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     // check if user exists and if user is verified
     const user = await checkUser(req.user);
-    const params = req.params;
-    // heck if params.id is in correct format
-    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
-    // check if team exists
-    const team = await Team.findById(params.id);
-    if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.players.length >= team.maxPlayers) throw new Error(responseErrors.team_full);
+    const team = await Team.findOne({players: user.id});
+
+    // check if im in a team
+    if (!team) throw new Error(responseErrors.not_in_team);
+
+    // check if im capitan or invitations are enabled
     if (team.invitations !== true && team.capitan !== user.id) throw new Error(responseErrors.invitations_disabled);
-    const body = req.body;
+
+    const params = req.params;
     // id of user to invite
-    if (!VerifyTeam.id(body.userId)) throw new Error(responseErrors.bad_format);
-    const userToInvite = await User.findById(body.userId);
+    if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
+    const userToInvite = await User.findById(params.id);
     if (!userToInvite) throw new Error(responseErrors.user_not_found);
-    if (team.players.includes(body.userId)) throw new Error(responseErrors.already_in_team);
-    if (await Invitation.findOne({ toUser: body.userId, team: params.id, type: invType.invitation })) throw new Error(responseErrors.already_invited);
+    if (team.players.includes(params.id)) throw new Error(responseErrors.already_in_team);
+    if (await Invitation.findOne({ toUser: params.id, team: team.id, type: invType.invitation })) throw new Error(responseErrors.already_invited);
     const invitation = new Invitation({
-        fromUser: user._id,
-        toUser: body.userId,
-        team: params.id,
+        fromUser: user.id,
+        toUser: params.id,
+        team: team.id,
         type: invType.invitation
     });
     await invitation.save();
@@ -237,7 +242,6 @@ router.delete("/players/invitation/:id", async (req, res) => {
 });
 
 // accept invitation - only receiver can accept
-//TODO
 router.patch("/players/invitation/:id/accept", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);

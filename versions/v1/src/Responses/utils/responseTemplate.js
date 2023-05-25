@@ -37,6 +37,7 @@ export const responseErrors = {
     already_exists: "already_exists",
     cant_have_more_than_one_tournament: "cant_have_more_than_one_tournament",
     tournament_not_found: "tournament_not_found",
+    not_in_team: "not_in_team"
 };
 
 export const responseSuccess = {
