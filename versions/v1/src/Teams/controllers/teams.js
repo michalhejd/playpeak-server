@@ -29,7 +29,7 @@ router.get("/@me", async (req, res) => {
 });
 
 // get all requests from user to teams (inbox for requests) - only reciever can get
-router.get("/@me/requests", async (req, res) => {
+router.get("/@me/requests/recive", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
@@ -37,12 +37,28 @@ router.get("/@me/requests", async (req, res) => {
 });
 
 // get all invitations for user (inbox for invitations) - only receiver can get
-router.get("/@me/invitations", async (req, res) => {
+router.get("/@me/invitations/recive", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation });
     handleSuccess(res, responseSuccess.invitations_found, invitations);
 });
+
+router.get("/@me/invitations/sent", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await checkUser(req.user);
+    const invitations = await Invitation.find({ fromUser: user.id, type: invType.invitation });
+    handleSuccess(res, responseSuccess.invitations_found, invitations);
+});
+
+// get all requests from team to user (inbox for requests) - only reciever can get
+router.get("/@me/requests/sent", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    const user = await checkUser(req.user);
+    const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
+    handleSuccess(res, responseSuccess.requests_found, requests);
+});
+
 
 // get team by id
 router.get("/:id", async (req, res) => {
