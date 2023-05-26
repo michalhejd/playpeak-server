@@ -29,7 +29,7 @@ router.get("/@me", async (req, res) => {
 });
 
 // get all requests from user to teams (inbox for requests) - only reciever can get
-router.get("/@me/requests/recived", async (req, res) => {
+router.get("/@me/requests/sent", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
@@ -37,7 +37,7 @@ router.get("/@me/requests/recived", async (req, res) => {
 });
 
 // get all invitations for user (inbox for invitations) - only receiver can get
-router.get("/@me/invitations/recived", async (req, res) => {
+router.get("/@me/invitations/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation });
@@ -52,7 +52,7 @@ router.get("/@me/invitations/sent", async (req, res) => {
 });
 
 // get all requests from team to user (inbox for requests) - only reciever can get
-router.get("/@me/requests/sent", async (req, res) => {
+router.get("/@me/requests/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const requests = await Invitation.find({ toUser: user.id, type: invType.request });
@@ -110,10 +110,6 @@ router.post("/", async (req, res) => {
     await team.save();
     handleSuccess(res, responseSuccess.team_created, team);
 });
-
-// :id/invite
-// 
-// 
 
 
 // invite player to team - only capitan can invite
@@ -209,7 +205,7 @@ router.delete("/leave", async (req, res) => {
     handleSuccess(res, responseSuccess.team_left);
 });
 
-// delete invitation - only sender and receiver can delete
+// delete invitation - only sender can delete
 router.delete("/players/invitation/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
@@ -217,7 +213,7 @@ router.delete("/players/invitation/:id", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const invitation = await Invitation.findById(params.id);
     if (!invitation) throw new Error(responseErrors.invitation_not_found);
-    if (invitation.toUser != user.id || invitation.fromUser != user.id) throw new Error(responseErrors.forbidden);
+    if (invitation.fromUser != user.id) throw new Error(responseErrors.forbidden);
     await Invitation.findByIdAndDelete(params.id);
     handleSuccess(res, responseSuccess.invitation_deleted);
 });
