@@ -41,14 +41,12 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "Already verified", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.verification_code_already_sent:
             return res.status(409).json({ meta: { message: "Verification code already sent", date: Date.now(), status: 409, error: err.message } });
-        // saveErrorToDabase(err, timeOfError);
         case responseErrors.email_already_exists:
             return res.status(409).json({ meta: { message: "Email already exists", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.nickname_already_exists:
             return res.status(409).json({ meta: { message: "Nickname already exists", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.name_already_exists:
             return res.status(409).json({ meta: { message: "Name already exists", date: Date.now(), status: 409, error: err.message } });
-        // saveErrorToDabase(err, timeOfError);
         case responseErrors.slug_taken:
             return res.status(409).json({ meta: { message: "Slug already taken", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_has_team:
