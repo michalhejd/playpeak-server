@@ -1,9 +1,7 @@
 import { responseErrors } from "./responseTemplate.js";
-import { saveErrorToDabase } from "../../Server/services/saveError.js";
 
 // handles all the errors
 export function handleErr(err, req, res, next) {
-    const timeOfError = Date.now();
     switch (err.message) {
         case responseErrors.bad_format:
             return res.status(400).json({ meta: { message: "Bad format", date: Date.now(), status: 400, error: err.message } });
