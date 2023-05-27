@@ -42,7 +42,8 @@ const tournamentSchema = new Schema({
     teams: {
         type: [Schema.Types.ObjectId],
         ref: 'Team',
-        required: false
+        required: false,
+        default: []
     },
     maxTeams: {
         type: Number,
@@ -53,22 +54,6 @@ const tournamentSchema = new Schema({
         type: String,
         required: true,
         enum: Object.values(gamemodes)
-    },
-    // contains all matches that were played in this tournament
-    matches: {
-        type: [Schema.Types.ObjectId],
-        ref: 'Match',
-        required: false
-    },
-    selection: {
-        type: Schema.Types.ObjectId || null,
-        ref: "Grouping",
-        required: true
-    },
-    brackets: {
-        type: [Schema.Types.ObjectId] || null,
-        ref: "Phase",
-        required: true
     }
 }, { timestamps: true });
 
