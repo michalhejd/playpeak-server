@@ -61,23 +61,6 @@ router.post('/', async (req, res) => {
     handleSuccess(res, responseSuccess.tournament_created);
 });
 
-router.get("/", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    await checkUser(req.user);
-    const tournaments = await Tournament.find();
-    handleSuccess(res, responseSuccess.tournaments_found, {tournaments});
-});
-
-router.get("/:id", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTournament.id(params.id)) throw new Error(responseErrors.bad_format);
-    const tournament = await Tournament.findById(params.id);
-    if (!tournament) throw new Error(responseErrors.tournament_not_found);
-    handleSuccess(res, responseSuccess.tournament_found, tournament);
-});
-
 // update tournament
 router.put("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -88,39 +71,30 @@ router.put("/:id", async (req, res) => {
     if (!VerifyTournament.id(params.id)) throw new Error(responseErrors.bad_format);
     const tournament = await Tournament.findById(params.id);
     const body = req.body;
+    if (new Date() >= new Date(body.startDate)) throw new Error(responseErrors.forbidden);
 
     if (body.name) {
         if(!VerifyTournament.name(body.name)) throw new Error(responseErrors.bad_format);
         tournament.name = body.name;
     }
-    if (body.game){
-        if(!VerifyTournament.id(body.game)) throw new Error(responseErrors.bad_format);
-        const game = await Game.findById(body.game);
-        if(!game) throw new Error(responseErrors.game_not_found);
-        tournament.game = body.game;
-    }
-    if (body.startDate){
+    if (body.startDate) {
         if(!VerifyTournament.date(body.startDate)) throw new Error(responseErrors.bad_format);
-        if(body.startDate <= tournament.endRegistration || body.startDate <= body.endRegistration) throw new Error(responseErrors.bad_format);
+        if(new Date(body.startDate) <= new Date(tournament.endRegistration) || new Date(body.startDate) <= new Date(body.endRegistration)) throw new Error(responseErrors.bad_format);
         tournament.startDate = body.startDate;
     }
-    if (body.startRegistration){
+    if (body.startRegistration) {
         if(!VerifyTournament.date(body.startRegistration)) throw new Error(responseErrors.bad_format);
-        if(body.startRegistration >= tournament.endRegistration || body.startRegistration >= body.endRegistration) throw new Error(responseErrors.bad_format);
+        if(new Date(body.startRegistration) >= new Date(tournament.endRegistration) || new Date(body.startRegistration) >= new Date(body.endRegistration)) throw new Error(responseErrors.bad_format);
         tournament.startRegistration = body.startRegistration;
     }
-    if (body.endRegistration){
+    if (body.endRegistration) {
         if(!VerifyTournament.date(body.endRegistration)) throw new Error(responseErrors.bad_format);
-        if(body.endRegistration <= tournament.startRegistration || body.endRegistration <= body.startRegistration) throw new Error(responseErrors.bad_format);
+        if(new Date(body.endRegistration) <= new Date(tournament.startRegistration) || new Date(body.endRegistration) <= new Date(body.startRegistration)) throw new Error(responseErrors.bad_format);
         tournament.endRegistration = body.endRegistration;
     }
-    if (body.maxTeams){
+    if (body.maxTeams) {
         if(!VerifyTournament.maxTeams(body.maxTeams)) throw new Error(responseErrors.bad_format);
         tournament.maxTeams = body.maxTeams;
-    }
-    if (body.gameMode){
-        if(!VerifyTournament.gameMode(body.gameMode)) throw new Error(responseErrors.bad_format);
-        tournament.gameMode = body.gameMode;
     }
     await tournament.save();
     handleSuccess(res, responseSuccess.tournament_updated);
