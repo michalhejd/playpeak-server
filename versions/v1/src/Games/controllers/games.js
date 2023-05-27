@@ -14,8 +14,8 @@ router.get("/", async (req, res) => {
     //verify user params
     await checkUser(req.user)
     //find all games in db
-    const games = await Game.find();
-    handleSuccess(res, responseSuccess.games_found, games);
+    const games = await Game.find().select("-__v");
+    handleSuccess(res, responseSuccess.games_found, {games});
 });
 
 router.post("/", async (req, res) => {
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
 
     await game.save();
 
-    handleSuccess(res, responseSuccess.game_created, game);
+    handleSuccess(res, responseSuccess.game_created);
 });
 
 router.put("/:id", async (req, res) => {
@@ -77,7 +77,7 @@ router.put("/:id", async (req, res) => {
 
     await game.save();
 
-    handleSuccess(res, responseSuccess.game_updated, game);
+    handleSuccess(res, responseSuccess.game_updated);
 });
 
 export default router;

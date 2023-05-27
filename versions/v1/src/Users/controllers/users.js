@@ -16,7 +16,6 @@ import { emailLimiter } from "../../RateLimit/services/ratelimit.js";
 
 const router = express.Router();
 
-
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
@@ -40,7 +39,7 @@ router.get("/", async (req, res) => {
             query.sort = { _id: 1 };
         }
     }
-    if(typeof query.whispering == "string") {
+    if (typeof query.whispering == "string") {
         // trimming input from frontend
         query.whispering = query.whispering.trim();
     }
@@ -54,7 +53,7 @@ router.get("/", async (req, res) => {
             { name: { $regex: query.whispering, $options: 'i' } }, // Search in Name field
             { nickname: { $regex: query.whispering, $options: 'i' } }, // Search in Nickname field
             { email: { $regex: query.whispering, $options: 'i' } } // Search in Email field
-          ]
+        ]
     }).select("-password -__v -expiresAt").lean().sort(query.sort || { _id: -1 }).skip((page - 1) * maxUsersPerPage).limit(maxUsersPerPage)
     // return param which will tell user on which page he is
     const currentPage = page;
@@ -69,7 +68,6 @@ router.get("/@self", async (req, res) => {
     // return user without his password and __v
     handleSuccess(res, responseSuccess.user_found, user);
 });
-
 
 router.get("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
@@ -107,7 +105,7 @@ router.post("/login", async (req, res) => {
 
 
 router.post("/register", emailLimiter, async (req, res) => {
-    if(req.user) throw new Error(responseErrors.already_logged_in);
+    if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
     // verify if all params are in correct format => if they are string, number, date, their length etc.
     // function returns true if all params are in correct format, otherwise returns false
@@ -153,17 +151,17 @@ router.post("/register", emailLimiter, async (req, res) => {
     handleSuccess(res, responseSuccess.user_created);
 });
 
-router.post("/resendVerification", emailLimiter,  async (req, res) => {
-    if(req.user) throw new Error(responseErrors.already_logged_in);
+router.post("/resendVerification", emailLimiter, async (req, res) => {
+    if (req.user) throw new Error(responseErrors.already_logged_in);
     const body = req.body;
-    if(typeof body.email !== 'string') throw new Error(responseErrors.bad_format);
+    if (typeof body.email !== 'string') throw new Error(responseErrors.bad_format);
 
     const user = await User.findOne({ email: body.email });
-    if(!user) throw new Error(responseErrors.user_not_found);
-    if(user.verified) throw new Error(responseErrors.already_verified);
+    if (!user) throw new Error(responseErrors.user_not_found);
+    if (user.verified) throw new Error(responseErrors.already_verified);
 
     const code = await Code.findOne({ sentToUser: user._id });
-    if(code) throw new Error(responseErrors.verification_code_already_sent);
+    if (code) throw new Error(responseErrors.verification_code_already_sent);
 
     const newCode = generateVerificationCode();
 
@@ -218,7 +216,7 @@ router.post("/", emailLimiter, async (req, res) => {
         verified: body.verified || false
     });
 
-    
+
     // save user to db
     await newUser.save();
 
@@ -235,7 +233,7 @@ router.post("/", emailLimiter, async (req, res) => {
         // send email with code if user is not verified
         sendEmail(newUser, code, process.env.EMAIL_VERIFICATION_URL + `/${verificationCode._id}`)
     }
-    
+
     handleSuccess(res, responseSuccess.user_created);
 });
 
@@ -367,21 +365,21 @@ router.patch("/verify", emailLimiter, async (req, res) => {
 
     // remove code from database
     try {
-        await Code.deleteOne({_id: code._id});
+        await Code.deleteOne({ _id: code._id });
     } catch (err) {
-         throw new Error(responseErrors.code_not_found);
+        throw new Error(responseErrors.code_not_found);
     }
     // save user with verified status
     await user.save();
-    
+
     handleSuccess(res, responseSuccess.user_verified);
 });
 
 router.patch("/verify/:id", emailLimiter, async (req, res) => {
     if (req.user) throw new Error(responseErrors.already_logged_in);
     const params = req.params;
-    if(typeof params.id !== "string") throw new Error(responseErrors.bad_format);
-    if(!VerifyUser.id(params.id)) throw new Error(responseErrors.bad_format);
+    if (typeof params.id !== "string") throw new Error(responseErrors.bad_format);
+    if (!VerifyUser.id(params.id)) throw new Error(responseErrors.bad_format);
     const code = await Code.findOne({ _id: params.id });
     if (!code) throw new Error(responseErrors.code_not_found);
 

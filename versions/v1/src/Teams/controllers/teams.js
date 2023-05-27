@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     //check if user exists and if user is verified
     await checkUser(req.user)
     const teams = await Team.find()
-    handleSuccess(res, responseSuccess.teams_found, teams)
+    handleSuccess(res, responseSuccess.teams_found, {teams})
 });
 
 // get team I'm in
@@ -33,7 +33,7 @@ router.get("/@me/requests/sent", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
-    handleSuccess(res, responseSuccess.requests_found, requests);
+    handleSuccess(res, responseSuccess.requests_found, {requests});
 });
 
 // get all invitations for user (inbox for invitations) - only receiver can get
@@ -41,14 +41,14 @@ router.get("/@me/invitations/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation });
-    handleSuccess(res, responseSuccess.invitations_found, invitations);
+    handleSuccess(res, responseSuccess.invitations_found, {invitations});
 });
 
 router.get("/@me/invitations/sent", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const invitations = await Invitation.find({ fromUser: user.id, type: invType.invitation });
-    handleSuccess(res, responseSuccess.invitations_found, invitations);
+    handleSuccess(res, responseSuccess.invitations_found, {invitations});
 });
 
 // get all requests from team to user (inbox for requests) - only reciever can get
@@ -56,7 +56,7 @@ router.get("/@me/requests/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
     const requests = await Invitation.find({ toUser: user.id, type: invType.request });
-    handleSuccess(res, responseSuccess.requests_found, requests);
+    handleSuccess(res, responseSuccess.requests_found, {requests});
 });
 
 
@@ -83,7 +83,7 @@ router.get("/:id/members", async (req, res) => {
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
     const members = await User.find({ _id: { $in: team.players } }).lean().select('-password -__v -expiresAt');
-    handleSuccess(res, responseSuccess.team_players_found, members);
+    handleSuccess(res, responseSuccess.team_players_found, {members});
 });
 
 // create team
@@ -108,7 +108,7 @@ router.post("/", async (req, res) => {
         invitations: body.invitations
     });
     await team.save();
-    handleSuccess(res, responseSuccess.team_created, team);
+    handleSuccess(res, responseSuccess.team_created);
 });
 
 
@@ -186,7 +186,7 @@ router.put("/:id", async (req, res) => {
         team.invitations = body.invitations;
     }
     await team.save();
-    handleSuccess(res, responseSuccess.team_updated, team);
+    handleSuccess(res, responseSuccess.team_updated);
 });
 
 // leave team - everyone can leave

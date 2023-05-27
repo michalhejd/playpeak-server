@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     await checkUser(req.user);
     const tournaments = await Tournament.find();
-    handleSuccess(res, responseSuccess.tournaments_found, tournaments);
+    handleSuccess(res, responseSuccess.tournaments_found, {tournaments});
 });
 
 router.get("/:id", async (req, res) => {

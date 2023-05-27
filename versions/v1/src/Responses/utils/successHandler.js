@@ -18,7 +18,7 @@ export function handleSuccess(res, response, data) {
             res.status(200).json({ meta: { message: "Login successful", date: Date.now(), status: 200 }, data: data });
             return;
         case responseSuccess.logout_success:
-            res.status(200).json({ meta: { message: "Logout successful", date: Date.now(), status: 200 }, data: data });
+            res.status(200).json({ meta: { message: "Logout successful", date: Date.now(), status: 200 } });
             return;
         case responseSuccess.user_verified:
             res.status(200).json({ meta: { message: "User verified", date: Date.now(), status: 200 } });
@@ -28,6 +28,9 @@ export function handleSuccess(res, response, data) {
             return;
         case responseSuccess.games_found:
             res.status(200).json({ meta: { message: "Games found", date: Date.now(), status: 200 }, data: data });
+            return;
+        case responseSuccess.game_found:
+            res.status(200).json({ meta: { message: "Game found", date: Date.now(), status: 200 }, data: data });
             return;
         case responseSuccess.game_updated:
             res.status(200).json({ meta: { message: "Game updated", date: Date.now(), status: 200 } });
@@ -90,16 +93,16 @@ export function handleSuccess(res, response, data) {
             res.status(200).json({ meta: { message: "Tournament joined", date: Date.now(), status: 200 } });
             return;
         case responseSuccess.user_created:
-            res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }, data: data });
+            res.status(201).json({ meta: { message: "User successfully created", date: Date.now(), status: 201 }});
             return;
         case responseSuccess.game_created:
-            res.status(201).json({ meta: { message: "Game successfully created", date: Date.now(), status: 201 }, data: data });
+            res.status(201).json({ meta: { message: "Game successfully created", date: Date.now(), status: 201 }});
             return;
         case responseSuccess.team_created:
-            res.status(201).json({ meta: { message: "Team successfully created", date: Date.now(), status: 201 }, data: data });
+            res.status(201).json({ meta: { message: "Team successfully created", date: Date.now(), status: 201 }});
             return;
         case responseSuccess.tournament_created:
-            res.status(201).json({ meta: { message: "Tournament successfully created", date: Date.now(), status: 201 }, data: data });
+            res.status(201).json({ meta: { message: "Tournament successfully created", date: Date.now(), status: 201 }});
             return;
         default:
             res.status(500).json({ meta: { message: "Internal server error", date: Date.now(), status: 500 } });

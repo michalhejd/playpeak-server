@@ -29,7 +29,8 @@ await defaultRoot()
 
 const app = express();
 app.use(cors({
-    origin: process.env.ORIGIN || "http://127.0.0.1:5173"
+    origin: process.env.ORIGIN || "http://127.0.0.1:5173",
+    credentials: true
 }));
 app.use(express.json())
 app.use(cookieParser());

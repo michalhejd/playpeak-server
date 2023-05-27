@@ -53,6 +53,7 @@ export const responseSuccess = {
     verification_email_sent: "verification_email_sent",
     game_created: "game_created",
     games_found: "games_found",
+    game_found: "game_found",
     game_updated: "game_updated",
     teams_found: "teams_found",
     team_found: "team_found",
