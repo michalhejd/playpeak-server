@@ -18,6 +18,19 @@ router.get("/", async (req, res) => {
     handleSuccess(res, responseSuccess.games_found, {games});
 });
 
+router.get("/:id", async (req, res) => {
+    if (!req.user) throw new Error(responseErrors.unauthorized);
+    //verify user params
+    await checkUser(req.user)
+    const params = req.params;
+    //check if id is valid
+    if(!VerifyGame.id(params.id)) throw new Error(responseErrors.bad_format);
+    //find game in db
+    const game = await Game.findById(params.id).select("-__v");
+    if(!game) throw new Error(responseErrors.game_not_found);
+    handleSuccess(res, responseSuccess.game_found, game);
+});
+
 router.post("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //pass to function which will check if user exists and if user is verified
