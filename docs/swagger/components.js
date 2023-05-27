@@ -2,9 +2,9 @@
  * @swagger
  * components:
  *  securitySchemes:
- *      cookieAuth:
+ *      session:
  *          type: apiKey
- *          name: cookie
- *          in: cookie
+ *          name: Authorization
+ *          in: header
  * 
  */

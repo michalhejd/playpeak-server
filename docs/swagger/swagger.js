@@ -24,10 +24,22 @@ const options = {
             {
                 name: 'Users',
                 description: 'API for managing users'
+            },
+            {
+                name: 'Teams',
+                description: 'API for managing teams'
+            },
+            {
+                name: 'Games',
+                description: 'API for managing games'
+            },
+            {
+                name: 'Tournaments',
+                description: 'API for managing tournaments'
             }
         ]
     },
-    apis: ['./docs/swagger/users/endpoints.js', './docs/swagger/users/models.js', './docs/swagger/components.js'],
+    apis: ['./docs/swagger/users/endpoints.js', './docs/swagger/users/models.js', './docs/swagger/components.js', './docs/swagger/teams/endpoints.js', './docs/swagger/teams/models.js', './docs/swagger/games/endpoints.js', './docs/swagger/games/models.js', './docs/swagger/tournaments/endpoints.js', './docs/swagger/tournaments/models.js'],
 
 };
 

@@ -50,22 +50,22 @@
  *                                                      example: 5f9f1b9b0b9b9b9b9b9b9b9b9
  *                                                  email:
  *                                                      type: String
- *                                                      example:
+ *                                                      example: novak.ja.2020@skola.ssps.cz
  *                                                  nickname:
  *                                                      type: String
- *                                                      example:
+ *                                                      example: Janecek1
  *                                                  name:
  *                                                      type: String
- *                                                      example:
+ *                                                      example: Jan Novák
  *                                                  birthdate:
  *                                                      type: Date
- *                                                      example:
+ *                                                      example: 2004-01-01T00:00:00.000Z
  *                                                  role:
  *                                                      type: Number
- *                                                      example:
+ *                                                      example: 0
  *                                                  verified:
  *                                                      type: Boolean
- *                                                      example:
+ *                                                      example: true
  *                                      maxPages:
  *                                          type: Number
  *                                          example: 2
@@ -131,9 +131,6 @@
  *                                      verified:
  *                                          type: Boolean
  *                                          example: true
- *                                      expiresAt:
- *                                          type: Date
- *                                          example: null
  *          401:
  *              description: Unauthorized.
  *          500:
@@ -174,6 +171,30 @@
  *                                      status:
  *                                          type: Number
  *                                          example: 200
+ *                              data:
+ *                                  type: object
+ *                                  properties:
+ *                                      _id:
+ *                                          type: String
+ *                                          example: 642ad0a05938a24b3c8a501e
+ *                                      email:
+ *                                          type: String
+ *                                          example: novak.ja.2020@skola.ssps.cz
+ *                                      nickname:
+ *                                          type: String
+ *                                          example: Janecek1
+ *                                      name:
+ *                                          type: String
+ *                                          example: Jan Novák
+ *                                      birthdate:
+ *                                          type: Date
+ *                                          example: 2004-01-01T00:00:00.000Z
+ *                                      role:
+ *                                          type: Number
+ *                                          example: 0
+ *                                      verified:
+ *                                          type: Boolean
+ *                                          example: true
  *          401:
  *              description: Unauthorized.
  *          403:
