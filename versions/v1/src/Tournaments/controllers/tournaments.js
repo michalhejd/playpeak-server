@@ -61,23 +61,6 @@ router.post('/', async (req, res) => {
     handleSuccess(res, responseSuccess.tournament_created);
 });
 
-router.get("/", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    await checkUser(req.user);
-    const tournaments = await Tournament.find();
-    handleSuccess(res, responseSuccess.tournaments_found, {tournaments});
-});
-
-router.get("/:id", async (req, res) => {
-    if (!req.user) throw new Error(responseErrors.unauthorized);
-    await checkUser(req.user);
-    const params = req.params;
-    if (!VerifyTournament.id(params.id)) throw new Error(responseErrors.bad_format);
-    const tournament = await Tournament.findById(params.id);
-    if (!tournament) throw new Error(responseErrors.tournament_not_found);
-    handleSuccess(res, responseSuccess.tournament_found, tournament);
-});
-
 // update tournament
 router.put("/:id", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
