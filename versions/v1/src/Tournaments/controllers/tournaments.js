@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     await checkUser(req.user);
-    const tournaments = await Tournament.find();
+    const tournaments = await Tournament.find().select("-__v -createdAt -updatedAt -organizer");
     handleSuccess(res, responseSuccess.tournaments_found, tournaments);
 });
 
@@ -24,7 +24,7 @@ router.get("/:id", async (req, res) => {
     await checkUser(req.user);
     const params = req.params;
     if (!VerifyTournament.id(params.id)) throw new Error(responseErrors.bad_format);
-    const tournament = await Tournament.findById(params.id);
+    const tournament = await Tournament.findById(params.id).select("-__v -createdAt -updatedAt -organizer");
     if (!tournament) throw new Error(responseErrors.tournament_not_found);
     handleSuccess(res, responseSuccess.tournament_found, tournament);
 });

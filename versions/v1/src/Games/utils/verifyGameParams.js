@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 export class VerifyGame {
     static name(name){
         if(typeof name !== 'string') return false;
@@ -20,6 +21,10 @@ export class VerifyGame {
     static slug(slug){
         if(typeof slug !== 'string') return false;
         if(slug.length < 3 || slug.length > 32) return false;
+        return true;
+    }
+    static id(id){
+        if(!mongoose.isValidObjectId(id)) return false;
         return true;
     }
 }

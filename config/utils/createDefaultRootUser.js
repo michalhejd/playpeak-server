@@ -8,7 +8,7 @@ export async function defaultRoot() {
         process.exit(0)
     }
     const email = process.env.ADMIN_EMAIL
-    const checkUser = await User.findOne({ email: email })
+    const checkUser = await User.findOne({ role: roles.root })
     if (checkUser) return
     //create random password for root
     const password = Math.random().toString(36).slice(-8);

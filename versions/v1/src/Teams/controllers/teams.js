@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
     await checkUser(req.user)
-    const teams = await Team.find()
+    const teams = await Team.find().select("-__v -createdAt -updatedAt")
     handleSuccess(res, responseSuccess.teams_found, {teams})
 });
 
@@ -23,7 +23,7 @@ router.get("/@me", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     //check if user exists and if user is verified
     const user = await checkUser(req.user)
-    const team = await Team.findOne({ players: user._id })
+    const team = await Team.findOne({ players: user._id }).select("-__v -createdAt -updatedAt")
     if (!team) throw new Error(responseErrors.team_not_found)
     handleSuccess(res, responseSuccess.team_found, team)
 });
@@ -32,7 +32,7 @@ router.get("/@me", async (req, res) => {
 router.get("/@me/requests/sent", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const requests = await Invitation.find({ fromUser: user.id, type: invType.request });
+    const requests = await Invitation.find({ fromUser: user.id, type: invType.request }).select("-__v -createdAt -updatedAt");
     handleSuccess(res, responseSuccess.requests_found, {requests});
 });
 
@@ -40,14 +40,14 @@ router.get("/@me/requests/sent", async (req, res) => {
 router.get("/@me/invitations/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation });
+    const invitations = await Invitation.find({ toUser: user.id, type: invType.invitation }).select("-__v -createdAt -updatedAt");
     handleSuccess(res, responseSuccess.invitations_found, {invitations});
 });
 
 router.get("/@me/invitations/sent", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const invitations = await Invitation.find({ fromUser: user.id, type: invType.invitation });
+    const invitations = await Invitation.find({ fromUser: user.id, type: invType.invitation }).select("-__v -createdAt -updatedAt");
     handleSuccess(res, responseSuccess.invitations_found, {invitations});
 });
 
@@ -55,7 +55,7 @@ router.get("/@me/invitations/sent", async (req, res) => {
 router.get("/@me/requests/received", async (req, res) => {
     if (!req.user) throw new Error(responseErrors.unauthorized);
     const user = await checkUser(req.user);
-    const requests = await Invitation.find({ toUser: user.id, type: invType.request });
+    const requests = await Invitation.find({ toUser: user.id, type: invType.request }).select("-__v -createdAt -updatedAt");
     handleSuccess(res, responseSuccess.requests_found, {requests});
 });
 
@@ -67,7 +67,7 @@ router.get("/:id", async (req, res) => {
     await checkUser(req.user)
     const params = req.params
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format)
-    const team = await Team.findById(params.id)
+    const team = await Team.findById(params.id).select("-__v -createdAt -updatedAt")
     if (!team) throw new Error(responseErrors.team_not_found)
     handleSuccess(res, responseSuccess.team_found, team)
 });
@@ -82,7 +82,7 @@ router.get("/:id/members", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
-    const members = await User.find({ _id: { $in: team.players } }).lean().select('-password -__v -expiresAt');
+    const members = await User.find({ _id: { $in: team.players } }).lean().select('-password -__v -expiresAt -createdAt -updatedAt');
     handleSuccess(res, responseSuccess.team_players_found, {members});
 });
 

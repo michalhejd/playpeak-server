@@ -39,8 +39,6 @@ export async function sendEmail(user, code, url) {
     }
 
     transporter.use("compile", hbs(hbsOptions))
-
-    console.log("Sending email to " + user.email)
     //mail options
     const mailOptions = {
         from: process.env.EMAIL_USER,
