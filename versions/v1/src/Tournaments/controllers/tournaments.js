@@ -37,7 +37,9 @@ router.post('/', async (req, res) => {
     if (user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
 
     const body = req.body;
-    if (!verifyTournamentBody(body.name, body.organizer, body.game, body.startDate, body.startRegistration, body.endRegistration, body.maxTeams, body.gameMode)) throw new Error(responseErrors.bad_format);
+    // date format: yyyy-mm-ddThh:mm:ss
+
+    if (!verifyTournamentBody(body.name, body.game, body.startDate, body.startRegistration, body.endRegistration, body.maxTeams, body.gameMode)) throw new Error(responseErrors.bad_format);
 
     if (!await Game.findById(body.game)) throw new Error(responseErrors.game_not_found);
 
@@ -46,7 +48,7 @@ router.post('/', async (req, res) => {
 
     const tournament = new Tournament({
         name: body.name,
-        organizer: body.organizer,
+        organizer: user.id,
         game: body.game,
         startDate: body.startDate,
         startRegistration: body.startRegistration,
