@@ -23,6 +23,8 @@ export function handleErr(err, req, res, next) {
             return res.status(403).json({ meta: { message: "Invitations are disabled", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.cant_have_more_than_one_tournament:
             return res.status(403).json({ meta: { message: "You can't have more than one tournament", date: Date.now(), status: 403, error: err.message } });
+        case responseErrors.reached_max_teams:
+            return res.status(403).json({ meta: { message: "You reached max teams", date: Date.now(), status: 403, error: err.message } });
         case responseErrors.user_not_found:
             return res.status(404).json({ meta: { message: "User not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.code_not_found:
@@ -33,6 +35,8 @@ export function handleErr(err, req, res, next) {
             return res.status(404).json({ meta: { message: "Team not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.player_not_found:
             return res.status(404).json({ meta: { message: "Player not found", date: Date.now(), status: 404, error: err.message } });
+        case responseErrors.tournament_not_found:
+            return res.status(404).json({ meta: { message: "Tournament not found", date: Date.now(), status: 404, error: err.message } });
         case responseErrors.already_logged_in:
             return res.status(409).json({ meta: { message: "Already logged in", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_verified:
@@ -65,8 +69,16 @@ export function handleErr(err, req, res, next) {
             return res.status(409).json({ meta: { message: "Team is full", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.not_in_team:
             return res.status(409).json({ meta: { message: "You are not in a team", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.not_in_tournament:
+            return res.status(409).json({ meta: { message: "You are not in a tournament", date: Date.now(), status: 409, error: err.message } });
         case responseErrors.already_joined:
             return res.status(409).json({ meta: { message: "You have already joined this tournament", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.not_enough_players:
+            return res.status(409).json({ meta: { message: "Not enough players", date: Date.now(), status: 409, error: err.message } });
+        case responseErrors.cant_update_team_while_in_tournament:
+            return res.status(409).json({ meta: { message: "Can`t update team while your team is joined in tournament", date: Date.now(), status: 409, error: err.message } })
+        case responseErrors.can_join_only_one_team:
+            return res.status(409).json({ meta: { message: "You can only join one team", date: Date.now(), status: 409, error: err.message } })
         case responseErrors.server_error:
             return res.status(500).json({ meta: { message: "Server error", date: Date.now(), status: 500 } });
         case responseErrors.update_password_or_nickname:

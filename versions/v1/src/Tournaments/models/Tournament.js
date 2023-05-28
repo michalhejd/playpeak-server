@@ -54,6 +54,10 @@ const tournamentSchema = new Schema({
         type: String,
         required: true,
         enum: Object.values(gamemodes)
+    },
+    finished: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

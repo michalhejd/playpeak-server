@@ -1,10 +1,11 @@
-import express from "express"
+import express, { response } from "express"
 import Team from "../models/Team.js";
 import Invitation, { invType } from "../models/Invitation.js";
 import { responseErrors, responseSuccess } from "../../Responses/utils/responseTemplate.js";
 import { handleSuccess } from "../../Responses/utils/successHandler.js";
 import { checkUser } from "../../Users/services/checkUser.js";
 import User, { roles } from "../../Users/models/User.js";
+import Tournament from "../../Tournaments/models/Tournament.js";
 import { VerifyTeam } from "../utils/verifyTeam.js";
 
 const router = express.Router();
@@ -173,7 +174,9 @@ router.put("/:id", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
-    if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
+    if (team.capitan != user.id || user.role < roles.superAdmin) throw new Error(responseErrors.forbidden);
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(tournament) throw new Error(responseErrors.cant_update_team_while_in_tournament)
     const body = req.body;
     // can't change password while tournament is ongoing
     if (body.name) {
@@ -195,8 +198,9 @@ router.delete("/leave", async (req, res) => {
     // check if user exists and if user is verified
     const user = await checkUser(req.user);
     const team = await Team.findOne({players: user.id});
-
     if (!team) throw new Error(responseErrors.team_not_found);
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(tournament) throw new Error(responseErrors.cant_update_team_while_in_tournament)
     if (team.capitan == user.id) throw new Error(responseErrors.cant_leave_your_team);
     if (!team.players.includes(user.id)) throw new Error(responseErrors.cant_leave_team_not_in);
     // keep all users in team except user who left
@@ -226,6 +230,8 @@ router.delete("/:id", async (req, res) => {
     if (!VerifyTeam.id(params.id)) throw new Error(responseErrors.bad_format);
     const team = await Team.findById(params.id);
     if (!team) throw new Error(responseErrors.team_not_found);
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(tournament) throw new Error(responseErrors.cant_update_team_while_in_tournament)
     // can`t delete team if team is joined in tournament
     if (team.capitan != user.id) throw new Error(responseErrors.forbidden);
     await Team.deleteOne({ _id: params.id });
@@ -239,6 +245,8 @@ router.delete("/members/:id", async (req, res) => {
     // check if user exists and if user is verified
     const user = await checkUser(req.user);
     const team = await Team.findOne({players: user.id});
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(tournament) throw new Error(responseErrors.cant_update_team_while_in_tournament)
     if(!team) throw new Error(responseErrors.team_not_found);
     if(team.capitan != user.id) throw new Error(responseErrors.forbidden);
     // can't remove member if tournament is ongoing
@@ -265,6 +273,8 @@ router.patch("/players/invitation/:id/accept", async (req, res) => {
         await Invitation.findByIdAndDelete(invitation.id)
         throw new Error(responseErrors.team_not_found);
     }
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(tournament) throw new Error(responseErrors.cant_update_team_while_in_tournament)
     if (invitation.type == invType.invitation) {
         if (invitation.toUser != user.id) throw new Error(responseErrors.forbidden);
         if (team.players.includes(user.id)) {

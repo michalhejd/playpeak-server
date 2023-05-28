@@ -39,6 +39,11 @@ export const responseErrors = {
     tournament_not_found: "tournament_not_found",
     not_in_team: "not_in_team",
     already_joined: "already_joined",
+    reached_max_teams: "reached_max_teams",
+    not_enough_players: "not_enough_players",
+    cant_update_team_while_in_tournament: "cant_update_team_while_in_tournament",
+    can_join_only_one_team: "can_join_only_one_team",
+    not_in_tournament: "not_in_tournament",
 };
 
 export const responseSuccess = {
@@ -75,4 +80,6 @@ export const responseSuccess = {
     tournament_updated: "tournament_updated",
     tournament_deleted: "tournament_deleted",
     tournament_joined: "tournament_joined",
+    tournament_left: "tournament_left",
+    steam_connection: "steam_connection",
 };

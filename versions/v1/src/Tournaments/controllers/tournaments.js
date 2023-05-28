@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { response } from 'express';
 import { roles } from '../../Users/models/User.js';
 import { checkUser } from '../../Users/services/checkUser.js';
 import { responseErrors, responseSuccess } from '../../Responses/utils/responseTemplate.js';
@@ -6,7 +6,9 @@ import { handleSuccess } from '../../Responses/utils/successHandler.js';
 import { verifyTournamentBody } from '../utils/verifyTournamentParams.js';
 import Tournament from '../models/Tournament.js';
 import Game from '../../Games/models/Game.js';
+import Team from '../../Teams/models/Team.js';
 import { VerifyTournament } from '../utils/verifyTournament.js';
+import { params } from '../../Steam/utils/params.js';
 
 const router = express.Router();
 
@@ -114,6 +116,54 @@ router.delete("/:id", async (req, res) => {
     if (!tournament) throw new Error(responseErrors.tournament_not_found);
     await Tournament.findByIdAndDelete(params.id);
     handleSuccess(res, responseSuccess.tournament_deleted);
+})
+
+router.patch("/:id/join", async (req, res) => {
+    if(!req.user) throw new Error(responseErrors.unauthorized)
+    const user = await checkUser(req.user)
+
+    const team = await Team.findOne({ capitan: user.id})
+    if(!team) throw new Error(responseErrors.team_not_found)
+
+    const joinedTournament = await Tournament.findOne({ teams: team.id, finished: false})
+    if(joinedTournament) throw new Error(responseErrors.can_join_only_one_team)
+    
+    if(team.players.length < 5) throw new Error(responseErrors.not_enough_players)
+
+    const params = req.params
+
+    if(!VerifyTournament.id(params.id)) throw new Error(responseErrors.bad_format)
+    const tournament = await Tournament.findById(params.id)
+    console.log(tournament)
+    if(!tournament) throw new Error(responseErrors.tournament_not_found)
+    if(tournament.teams.includes(team.id)) throw new Error(responseErrors.already_joined)
+    if(tournament.startRegistration > new Date()) throw new Error(responseErrors.forbidden)
+    if(tournament.endRegistration < new Date()) throw new Error(responseErrors.forbidden)
+    if(tournament.teams.length >= tournament.maxTeams) throw new Error(responseErrors.reached_max_teams)
+
+    tournament.teams.push(team.id)
+
+    await tournament.save()
+
+    handleSuccess(res, responseSuccess.tournament_joined)
+})
+
+router.patch("/leave", async (req, res) => {
+    if(!req.user) throw new Error(responseErrors.unauthorized)
+    const user = await checkUser(req.user)
+
+    const team = await Team.findOne({ capitan: user.id})
+    if(!team) throw new Error(responseErrors.team_not_found)
+
+    const tournament = await Tournament.findOne({ teams: team.id, finished: false})
+    console.log(tournament)
+    if(!tournament) throw new Error(responseErrors.not_in_tournament)
+
+    //delete team from tournament
+    tournament.teams = tournament.teams.filter(t => t != team.id)
+    await tournament.save()
+
+    handleSuccess(res, responseSuccess.tournament_left)
 })
 
 export default router;
